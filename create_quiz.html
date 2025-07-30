@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .container { max-width: 600px; margin: auto; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .error { color: red; }
+        label { display: block; text-align: left; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create Quiz</h2>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="POST">
+            <label>Quiz Name:</label>
+            <input type="text" name="quiz_name" placeholder="Enter quiz name" required>
+            
+            <label>Number of Questions:</label>
+            <input type="number" name="num_questions" min="1" max="50" required>
+            
+            <label>Total Quiz Time (seconds):</label>
+            <input type="number" name="total_time" min="60" required>
+            
+            <label>Time per Question (seconds):</label>
+            <input type="number" name="per_question_time" min="10" required>
+            
+            <label>Difficulty:</label>
+            <select name="difficulty" required>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="mix">Mix</option>
+            </select>
+            
+            <label>Question Types (select multiple):</label>
+            <select name="question_types" multiple required>
+                <optgroup label="Quantitative Aptitude">
+                    <option value="arithmetic">Arithmetic (percentages, profit & loss, averages, ratios)</option>
+                    <option value="algebra">Algebra, equations, inequalities</option>
+                    <option value="time_work">Time & work, speed & distance</option>
+                    <option value="probability">Probability, permutations & combinations</option>
+                    <option value="data_interpretation">Data interpretation (tables, graphs)</option>
+                </optgroup>
+                <optgroup label="Logical Reasoning">
+                    <option value="puzzles">Puzzles, seating arrangements</option>
+                    <option value="blood_relations">Blood relations</option>
+                    <option value="series">Series (numbers, letters)</option>
+                    <option value="coding_decoding">Coding-decoding</option>
+                    <option value="syllogisms">Syllogisms</option>
+                </optgroup>
+                <optgroup label="Verbal Ability">
+                    <option value="grammar">Grammar correction</option>
+                    <option value="synonyms_antonyms">Synonyms & antonyms</option>
+                    <option value="reading_comprehension">Reading comprehension</option>
+                    <option value="sentence_completion">Sentence completion</option>
+                    <option value="para_jumbles">Para jumbles</option>
+                </optgroup>
+            </select>
+            
+            <label>Selection Mode:</label>
+            <select name="selection_mode" required>
+                <option value="multiple">Multiple</option>
+                <option value="individual">Individual</option>
+            </select>
+            
+            <button type="submit">Generate Quiz</button>
+        </form>
+        <p><a href="/dashboard">Back to Dashboard</a></p>
+    </div>
+</body>
+</html>
