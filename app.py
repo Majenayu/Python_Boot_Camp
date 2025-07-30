@@ -6,6 +6,7 @@ import os
 import requests
 import json
 import datetime
+import random
 
 # Set template_folder to current directory
 app = Flask(__name__, template_folder=os.path.dirname(os.path.abspath(__file__)))
@@ -16,65 +17,65 @@ client = MongoClient('mongodb+srv://apt:apt@apt.ydfi6pf.mongodb.net/?retryWrites
 db = client['school']
 users = db['users']
 
-# OpenRouter API configuration
-OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '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')
-OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+# OpenTDB API configuration
+OPENTDB_API_URL = 'https://opentdb.com/api.php'
 
 def generate_questions(num_questions, difficulty, question_types, selection_mode):
-    prompt = f"""
-    Generate {num_questions} aptitude quiz questions with the following specifications:
-    - Difficulty: {difficulty} (if 'mix', include a balanced mix of easy, medium, and hard)
-    - Question Types: {', '.join(question_types)} (if multiple, distribute evenly)
-    - Format: Each question must have exactly 4 multiple-choice options, one correct answer, and an explanation.
-    - Output as JSON with the structure: 
-      [
-        {{
-          "question": "string",
-          "options": ["string", "string", "string", "string"],
-          "correct_answer": "string",
-          "explanation": "string",
-          "type": "string",
-          "difficulty": "string"
-        }}
-      ]
-    """
-    headers = {
-        'Authorization': f'Bearer {OPENROUTER_API_KEY}',
-        'Content-Type': 'application/json'
+    # Map difficulty to OpenTDB format
+    opentdb_difficulty = difficulty.lower() if difficulty.lower() in ['easy', 'medium', 'hard'] else ''
+    # Map question types to OpenTDB categories
+    category_map = {
+        'arithmetic': 19,  # Science: Mathematics
+        'algebra': 19,
+        'geometry': 19,
+        'logical reasoning': 23,  # History (proxy, as OpenTDB lacks logical reasoning)
+        'verbal reasoning': 10,  # General Knowledge
     }
-    data = {
-        'model': 'gpt-4o-mini',
-        'messages': [{'role': 'user', 'content': prompt}]
+    category_ids = [category_map.get(qt.lower(), 10) for qt in question_types]
+    category_id = random.choice(category_ids) if category_ids else 10  # Default to General Knowledge
+    
+    params = {
+        'amount': min(num_questions, 50),  # OpenTDB has a max of 50 questions per request
+        'type': 'multiple',  # Only multiple-choice questions
+        'category': category_id,
     }
+    if opentdb_difficulty:
+        params['difficulty'] = opentdb_difficulty
+    
     try:
-        response = requests.post(OPENROUTER_API_URL, headers=headers, json=data)
-        print(f"API Response Status: {response.status_code}")
-        print(f"API Response Text: {response.text}")
+        response = requests.get(OPENTDB_API_URL, params=params)
+        print(f"OpenTDB Response Status: {response.status_code}")
+        print(f"OpenTDB Response Text: {response.text}")
         response.raise_for_status()
         response_data = response.json()
-        if not response_data.get('choices') or not response_data['choices'][0].get('message') or not response_data['choices'][0]['message'].get('content'):
-            return [], f"API returned empty or invalid response: {response.text}"
         
-        content = response_data['choices'][0]['message']['content']
-        try:
-            questions = json.loads(content)
-            if not isinstance(questions, list):
-                return [], f"API response is not a valid JSON list: {content}"
-            for q in questions:
-                if not all(key in q for key in ['question', 'options', 'correct_answer', 'explanation', 'type', 'difficulty']) or len(q['options']) != 4:
-                    return [], f"Invalid question format in API response: {content}"
-            return questions, None
-        except json.JSONDecodeError as e:
-            return [], f"JSON parsing error: {str(e)} - Response: {content}"
+        if response_data.get('response_code') != 0:
+            error_codes = {
+                1: "Not enough questions available for the specified criteria",
+                2: "Invalid parameter in request",
+                3: "Session token not found",
+                4: "Session token has returned all possible questions",
+                5: "Rate limit exceeded (1 request per 5 seconds)"
+            }
+            return [], f"OpenTDB error: {error_codes.get(response_data['response_code'], 'Unknown error')}"
+        
+        questions = []
+        for q in response_data.get('results', []):
+            options = q['incorrect_answers'] + [q['correct_answer']]
+            random.shuffle(options)  # Randomize option order
+            questions.append({
+                'question': q['question'],
+                'options': options,
+                'correct_answer': q['correct_answer'],
+                'explanation': f"This question is from the {q['category']} category with {q['difficulty']} difficulty.",
+                'type': q['type'],
+                'difficulty': q['difficulty']
+            })
+        if not questions:
+            return [], "No questions returned from OpenTDB"
+        return questions, None
     except requests.exceptions.HTTPError as e:
-        status = response.status_code
-        if status == 401:
-            return [], "Invalid or unauthorized API key"
-        elif status == 429:
-            return [], "API rate limit exceeded"
-        elif status == 500:
-            return [], "OpenRouter server error"
-        return [], f"HTTP error: {str(e)} (Status: {status})"
+        return [], f"HTTP error: {str(e)} (Status: {response.status_code})"
     except requests.exceptions.RequestException as e:
         return [], f"API request failed: {str(e)}"
 
