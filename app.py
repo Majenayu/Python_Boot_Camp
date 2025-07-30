@@ -9,7 +9,7 @@ import datetime
 
 # Set template_folder to current directory
 app = Flask(__name__, template_folder=os.path.dirname(os.path.abspath(__file__)))
-app.secret_key = 'your-secret-key'  # Replace with a secure key
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key')  # Use environment variable
 
 # MongoDB connection
 client = MongoClient('mongodb+srv://apt:apt@apt.ydfi6pf.mongodb.net/?retryWrites=true&w=majority&appName=apt')
@@ -17,7 +17,7 @@ db = client['school']
 users = db['users']
 
 # OpenRouter API configuration
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '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')
 OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
 def generate_questions(num_questions, difficulty, question_types, selection_mode):
@@ -48,22 +48,33 @@ def generate_questions(num_questions, difficulty, question_types, selection_mode
     }
     try:
         response = requests.post(OPENROUTER_API_URL, headers=headers, json=data)
-        response.raise_for_status()  # Raises exception for 4xx/5xx status codes
+        print(f"API Response Status: {response.status_code}")
+        print(f"API Response Text: {response.text}")
+        response.raise_for_status()
         response_data = response.json()
         if not response_data.get('choices') or not response_data['choices'][0].get('message') or not response_data['choices'][0]['message'].get('content'):
-            return [], "API returned empty or invalid response"
+            return [], f"API returned empty or invalid response: {response.text}"
         
         content = response_data['choices'][0]['message']['content']
         try:
             questions = json.loads(content)
             if not isinstance(questions, list):
-                return [], "API response is not a valid JSON list"
+                return [], f"API response is not a valid JSON list: {content}"
             for q in questions:
                 if not all(key in q for key in ['question', 'options', 'correct_answer', 'explanation', 'type', 'difficulty']) or len(q['options']) != 4:
-                    return [], "Invalid question format in API response"
+                    return [], f"Invalid question format in API response: {content}"
             return questions, None
         except json.JSONDecodeError as e:
-            return [], f"JSON parsing error: {str(e)}"
+            return [], f"JSON parsing error: {str(e)} - Response: {content}"
+    except requests.exceptions.HTTPError as e:
+        status = response.status_code
+        if status == 401:
+            return [], "Invalid or unauthorized API key"
+        elif status == 429:
+            return [], "API rate limit exceeded"
+        elif status == 500:
+            return [], "OpenRouter server error"
+        return [], f"HTTP error: {str(e)} (Status: {status})"
     except requests.exceptions.RequestException as e:
         return [], f"API request failed: {str(e)}"
 
@@ -127,6 +138,7 @@ def create_quiz():
         questions, error = generate_questions(num_questions, difficulty, question_types, selection_mode)
         
         if error or not questions:
+            print(f"Quiz generation error: {error}")
             return render_template('create_quiz.html', error=f'Failed to generate questions: {error or "Unknown error"}')
         
         # Store quiz configuration in MongoDB
