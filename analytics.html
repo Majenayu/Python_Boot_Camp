@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #123a6e, #ffffff);
+            color: #123a6e;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 40px 0 30px;
+            font-size: 32px;
+            color: white;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .line-chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 900px;
+            margin: 0 auto 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .pie-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .pie-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .pie-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #123a6e;
+        }
+
+        canvas {
+            margin-top: 10px;
+        }
+
+        p {
+            margin-top: 10px;
+            color: #123a6e;
+            font-size: 14px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin: 40px 0;
+            text-decoration: none;
+            font-weight: bold;
+            color: white;
+            background-color: #123a6e;
+            padding: 10px 20px;
+            border-radius: 5px;
+            max-width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        a:hover {
+            background-color: #1b4e8f;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .pie-card {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2>📈 Overall Quiz Analytics</h2>
+
+{% if quizzes %}
+    <div class="line-chart-container">
+        <canvas id="lineChart"></canvas>
+    </div>
+
+    <div class="pie-grid">
+        {% for quiz in quizzes %}
+            <div class="pie-card">
+                <h3>{{ quiz.quiz_name }} ({{ quiz.date }})</h3>
+                <canvas id="pieChart{{ loop.index }}"></canvas>
+                <p><strong>Score:</strong> {{ quiz.correct }}/{{ quiz.num_questions }} 
+                ({{ (quiz.correct / quiz.num_questions * 100) | round(2) }}%)</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p style="text-align:center; color: white; font-size: 18px;">No completed quizzes to display analytics.</p>
+{% endif %}
+
+<a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+
+<script>
+    const quizzes = {{ quizzes | tojson }};
+    
+    // Line chart (keep same)
+    if (quizzes.length) {
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        const quizDates = quizzes.map(q => q.date);
+        const quizScores = quizzes.map(q => q.correct);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: quizDates,
+                datasets: [{
+                    label: 'Score Trend',
+                    data: quizScores,
+                    fill: false,
+                    borderColor: '#123a6e',
+                    backgroundColor: '#123a6e',
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, stepSize: 1 }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    // Pie charts with slow animation & simulated 3D
+    quizzes.forEach((quiz, index) => {
+        const ctx = document.getElementById('pieChart' + (index + 1)).getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [quiz.correct, quiz.incorrect],
+                    backgroundColor: [
+                        'rgba(76, 175, 80, 0.85)',   // Correct (semi-transparent)
+                        'rgba(244, 67, 54, 0.85)'    // Incorrect
+                    ],
+                    borderColor: [
+                        'rgba(0,0,0, 1)',      // Darker border for depth
+                        'rgba(0,0,0, 1)'
+                    ],
+                    borderWidth: 3,   // Thicker border for “3D” feel
+                    hoverOffset: 12   // Makes slice pop out more on hover
+                }]
+            },
+            options: {
+                responsive: true,
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 3000,           // Slow: 3 seconds
+                    easing: 'easeInOutQuart'  // Smooth easing
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed;
+                                const percent = ((value / quiz.num_questions) * 100).toFixed(1);
+                                return `${context.label}: ${value} (${percent}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

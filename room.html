@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room: {{ room.quiz_name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function updateRoomStatus() {
+            fetch('{{ url_for("room_status", room_id=room._id) }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'unauthenticated') {
+                        document.getElementById('warning').classList.remove('hidden');
+                        return;
+                    }
+                    if (data.error) {
+                        console.error(data.error);
+                        return;
+                    }
+                    document.getElementById('num-students').textContent = data.num_students;
+                    document.getElementById('student-list').innerHTML = data.students.map(s => `<li>${s}</li>`).join('');
+                    document.getElementById('room-status').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        setInterval(updateRoomStatus, 5000);
+        window.onload = updateRoomStatus;
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Room: {{ room.quiz_name }}</h1>
+        <p class="text-lg mb-4">Room Code: <span class="font-mono">{{ room.room_code }}</span></p>
+        <p class="text-lg mb-4">Status: <span id="room-status">{{ room.status | capitalize }}</span></p>
+        <p class="text-lg mb-4">Students Joined: <span id="num-students">{{ room.num_students }}</span></p>
+        <div id="warning" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+            <p><strong>Warning:</strong> Your session may have expired or been overwritten. Please log in again as a teacher in a separate browser or incognito window to avoid conflicts with student sessions.</p>
+        </div>
+        <h2 class="text-xl font-semibold mb-2">Students</h2>
+        <ul id="student-list" class="list-disc pl-6 mb-6">
+            {% for student in room.students %}
+                <li>{{ student }}</li>
+            {% endfor %}
+        </ul>
+        {% if room.status == 'active' %}
+            <a href="{{ url_for('start_quiz', room_id=room._id) }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Start Quiz</a>
+        {% endif %}
+        {% if room.status == 'started' %}
+            <a href="{{ url_for('stop_quiz', room_id=room._id) }}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Stop Quiz</a>
+        {% endif %}
+        <a href="{{ url_for('score', room_id=room._id) }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">View Scores</a>
+        <a href="{{ url_for('teacher_dashboard') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back to Dashboard</a>
+    </div>
+</body>
+</html>
