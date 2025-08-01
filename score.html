@@ -1,48 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Score: {{ room.quiz_name }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Pass Jinja2 variables as a JSON string to avoid linter errors
-        window.scoreData = JSON.parse('{{ {"scoreDistribution": score_distribution, "numQuestions": room.num_questions + 1} | tojson | safe }}');
-    </script>
-    <script src="{{ url_for('static', filename='score_chart.js') }}"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Score: {{ room.quiz_name }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    window.scoreData = JSON.parse('{{ {"scoreDistribution": score_distribution, "numQuestions": room.num_questions + 1} | tojson | safe }}');
+  </script>
+  <script src="{{ url_for('static', filename='score_chart.js') }}"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to bottom, #123a6e, #ffffff);
+      color: #123a6e;
+    }
+
+    h1, h2 {
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    table {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    canvas {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .btn {
+      transition: all 0.3s ease-in-out;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      table th, table td {
+        font-size: 14px;
+        padding: 8px;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6">Score: {{ room.quiz_name }}</h1>
-        <h2 class="text-2xl font-semibold mb-4">Leaderboard</h2>
-        {% if leaderboard %}
-            <table class="w-full border-collapse mb-6">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border p-2">Rank</th>
-                        <th class="border p-2">Student</th>
-                        <th class="border p-2">Score</th>
-                        <th class="border p-2">Percentage</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in leaderboard %}
-                        <tr>
-                            <td class="border p-2">{{ loop.index }}</td>
-                            <td class="border p-2">{{ result.name }}</td>
-                            <td class="border p-2">{{ result.score }}/{{ room.num_questions }}</td>
-                            <td class="border p-2">{{ (result.score / room.num_questions * 100) | round(2) }}%</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No student results yet.</p>
-        {% endif %}
-        <h2 class="text-2xl font-semibold mb-4">Score Distribution</h2>
-        <canvas id="scoreChart" class="mb-6"></canvas>
-        <a href="{{ url_for('teacher_dashboard') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back to Dashboard</a>
+<body>
+  <div class="container mx-auto p-6 fade-in">
+    <h1 class="text-3xl font-bold mb-6 text-center">Score: {{ room.quiz_name }}</h1>
+
+    <h2 class="text-2xl font-semibold mb-4 text-center">Leaderboard</h2>
+
+    {% if leaderboard %}
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="border p-3 text-left">Rank</th>
+              <th class="border p-3 text-left">Student</th>
+              <th class="border p-3 text-left">Score</th>
+              <th class="border p-3 text-left">Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for result in leaderboard %}
+              <tr class="hover:bg-gray-100 transition">
+                <td class="border p-3">{{ loop.index }}</td>
+                <td class="border p-3">{{ result.name }}</td>
+                <td class="border p-3">{{ result.score }}/{{ room.num_questions }}</td>
+                <td class="border p-3">{{ (result.score / room.num_questions * 100) | round(2) }}%</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-center text-white text-lg mb-6">No student results yet.</p>
+    {% endif %}
+
+    <h2 class="text-2xl font-semibold mb-4 text-center">Score Distribution</h2>
+    <div class="mb-6 fade-in">
+      <canvas id="scoreChart" class="w-full"></canvas>
     </div>
+
+    <div class="text-center">
+      <a href="{{ url_for('teacher_dashboard') }}"
+         class="btn inline-block bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-800 shadow-md">
+         ⬅️ Back to Dashboard
+      </a>
+    </div>
+  </div>
 </body>
 </html>
