@@ -474,15 +474,24 @@ def download_results(quiz_id):
 
 @app.route('/download_room_results/<room_id>')
 def download_room_results(room_id):
-    if 'user_id' not in session or session['role'] != 'student':
+    if 'user_id' not in session:
         logger.debug(f"Unauthorized access to download_room_results {room_id}: {session}")
         return redirect(url_for('login'))
     user_name = session['name']
     room = rooms.find_one({'_id': ObjectId(room_id)})
-    if not room or user_name not in room.get('students', []):
-        return "Room not found or user not authorized", 404
-    student_result = next((result for result in room.get('student_results', []) if result['name'] == user_name), None)
-    if not student_result or 'results' not in student_result:
+    if not room:
+        return "Room not found", 404
+    # Allow teachers to download all results, students only their own
+    if session['role'] == 'student' and user_name not in room.get('students', []):
+        logger.debug(f"Student {user_name} not authorized for room {room_id}")
+        return "User not authorized for this room", 403
+    student_result = None
+    if session['role'] == 'student':
+        student_result = next((result for result in room.get('student_results', []) if result['name'] == user_name), None)
+    elif session['role'] == 'teacher' and room['teacher_id'] == session['user_id']:
+        student_result = {'name': 'All', 'score': sum(r['score'] for r in room.get('student_results', [])), 'results': [r for r in room.get('student_results', []) for r in (r['results'] if 'results' in r else [])]}
+    if not student_result or ('results' not in student_result and session['role'] == 'student'):
+        logger.debug(f"No results found for {user_name} in room {room_id}")
         return "No results found for this user in the room", 404
     output = io.StringIO()
     writer = csv.writer(output, lineterminator='\n')
@@ -491,19 +500,31 @@ def download_room_results(room_id):
     writer.writerow(['Percentage', f"{(student_result.get('score', 0) / room.get('num_questions', 1) * 100):.2f}%"])
     writer.writerow([])
     writer.writerow(['Question Number', 'Question', 'Your Answer', 'Correct Answer', 'Result', 'Explanation'])
-    for i, result in enumerate(student_result['results'], 1):
-        writer.writerow([
-            i,
-            result['question'],
-            result['user_answer'] or 'Not answered',
-            result['correct_answer'],
-            'Correct' if result['correct'] else 'Incorrect',
-            result['explanation']
-        ])
+    if session['role'] == 'teacher':
+        for i, result in enumerate(student_result['results'], 1):
+            writer.writerow([
+                i,
+                result['question'],
+                result['user_answer'] or 'Not answered',
+                result['correct_answer'],
+                'Correct' if result['correct'] else 'Incorrect',
+                result['explanation']
+            ])
+    else:
+        for i, result in enumerate(student_result['results'], 1):
+            writer.writerow([
+                i,
+                result['question'],
+                result['user_answer'] or 'Not answered',
+                result['correct_answer'],
+                'Correct' if result['correct'] else 'Incorrect',
+                result['explanation']
+            ])
     content = output.getvalue()
     output.close()
     response = make_response(content)
-    response.headers["Content-Disposition"] = f"attachment; filename=room_quiz_{room_id}_results.csv"
+    filename = f"room_quiz_{room_id}_results_{'all' if session['role'] == 'teacher' else user_name}.csv"
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
     response.headers["Content-Type"] = "text/csv"
     return response
 
