@@ -1,19 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        a { margin: 10px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
-        a:hover { background: #0056b3; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to bottom, #123a6e, #ffffff);
+      color: #123a6e;
+    }
+
+    h1 {
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    p {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #f0f8ff;
+    }
+
+    /* Grid 2 columns on medium+ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Base button style */
+    .grid a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 140px; /* increased height */
+      color: black;
+      font-weight: bold;
+      border-radius: 12px;
+      font-size: 20px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transition: transform 0.3s ease, filter 0.3s ease;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    /* Different light pastel backgrounds */
+    .create-quiz {
+      background-color: #8ecae6; /* light blue */
+      box-shadow: 0 4px 12px rgba(142, 202, 230, 0.5);
+    }
+
+    .join-room {
+      background-color: #ffb4a2; /* light coral */
+      box-shadow: 0 4px 12px rgba(255, 180, 162, 0.5);
+    }
+
+    .analytics {
+      background-color: #ffd6a5; /* light orange */
+      box-shadow: 0 4px 12px rgba(255, 214, 165, 0.5);
+      color: #123a6e; /* dark text for contrast */
+    }
+
+    .logout {
+      background-color: #caf0f8; /* light cyan */
+      box-shadow: 0 4px 12px rgba(202, 240, 248, 0.5);
+      color: #123a6e; /* dark text */
+    }
+
+    /* Hover: scale up + brighten */
+    .grid a:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    @media (max-width: 768px) {
+      .grid a {
+        font-size: 18px;
+        height: 120px;
+      }
+    }
+
+    .container {
+      padding-top: 60px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .emoji {
+    font-size: 2.5rem;
+    margin-right: 8px;
+    line-height: 1;
+  }
+  </style>
 </head>
 <body>
-    <h1>Welcome, {{ user['email'] }} ({{ user['role'].capitalize() }})</h1>
-    <p>This is your dashboard.</p>
-    <a href="/create_quiz">Create Quiz</a>
-    <a href="/logout">Logout</a>
+  <div class="container p-6">
+    <h1 class="text-3xl font-bold mb-6">Welcome, {{ user['name'] }} (Student)</h1>
+    <p class="text-lg mb-4">This is your student dashboard.</p>
+    <div class="grid">
+  <a href="{{ url_for('create_quiz') }}" class="create-quiz">
+    <span class="emoji">📝</span> Create Quiz
+  </a>
+  <a href="{{ url_for('join_room') }}" class="join-room">
+    <span class="emoji">🏫</span> Join Room
+  </a>
+  <a href="{{ url_for('analytics') }}" class="analytics">
+    <span class="emoji">📊</span> View Analytics
+  </a>
+  <a href="{{ url_for('logout') }}" class="logout">
+    <span class="emoji">🚪</span> Logout
+  </a>
+</div>
+
+  </div>
 </body>
 </html>

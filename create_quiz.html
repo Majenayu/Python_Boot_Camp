@@ -1,80 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Quiz</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        .container { max-width: 600px; margin: auto; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .error { color: red; }
-        label { display: block; text-align: left; margin: 5px 0; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #123a6e 30%, #ffffff 100%);
+      color: #123a6e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+      color: white;
+      font-size: 2.8em;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    .container {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 800px;
+      width: 95%;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+
+    form {
+      display: grid;
+      gap: 20px;
+    }
+
+    input[type="text"], input[type="number"], select {
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+      width: 100%;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+      border-color: #1b4e8f;
+      outline: none;
+    }
+
+    .question-types {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .question-types h3 {
+      margin-top: 0;
+      color: #123a6e;
+      font-size: 1.3em;
+      margin-bottom: 15px;
+    }
+
+    .question-types label {
+      display: block;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .question-types input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    button {
+      background-color: #123a6e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      background-color: #1b4e8f;
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.1);
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    #confirmation {
+      display: none;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      text-align: left;
+    }
+
+    #confirmation h3 {
+      color: #123a6e;
+      margin-top: 0;
+    }
+
+    #confirmation p {
+      margin: 8px 0;
+    }
+
+    #confirmation .button-group {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+    }
+
+    footer {
+      margin-top: auto;
+      color: white;
+      text-align: center;
+      font-size: 0.9em;
+      padding: 15px 0;
+    }
+
+    @media (max-width: 600px) {
+      h2 { font-size: 2em; }
+      .container { padding: 20px; }
+      button { font-size: 1em; padding: 10px 20px; }
+    }
+  </style>
+  <script>
+    function showConfirmation() {
+      const form = document.getElementById('quizForm');
+      const selectedTypes = Array.from(form.querySelectorAll('input[name="question_types"]:checked')).map(cb => cb.value);
+      if (!selectedTypes.length) {
+        alert('Please select at least one category.');
+        return false;
+      }
+      document.getElementById('confirmQuizName').textContent = form.quiz_name.value;
+      document.getElementById('confirmNumQuestions').textContent = form.num_questions.value;
+      document.getElementById('confirmDifficulty').textContent = form.difficulty.value;
+      document.getElementById('confirmSelectionMode').textContent = form.selection_mode.value;
+      document.getElementById('selectedTypes').textContent = selectedTypes.join(', ');
+      document.getElementById('confirmation').style.display = 'block';
+      return false;
+    }
+    function confirmSubmission() {
+      document.getElementById('quizForm').submit();
+    }
+    function cancelConfirmation() {
+      document.getElementById('confirmation').style.display = 'none';
+    }
+  </script>
 </head>
 <body>
-    <div class="container">
-        <h2>Create Quiz</h2>
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-        <form method="POST">
-            <label>Quiz Name:</label>
-            <input type="text" name="quiz_name" placeholder="Enter quiz name" required>
-            
-            <label>Number of Questions:</label>
-            <input type="number" name="num_questions" min="1" max="50" required>
-            
-            <label>Total Quiz Time (seconds):</label>
-            <input type="number" name="total_time" min="60" required>
-            
-            <label>Time per Question (seconds):</label>
-            <input type="number" name="per_question_time" min="10" required>
-            
-            <label>Difficulty:</label>
-            <select name="difficulty" required>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-                <option value="mix">Mix</option>
-            </select>
-            
-            <label>Question Types (select multiple):</label>
-            <select name="question_types" multiple required>
-                <optgroup label="Quantitative Aptitude">
-                    <option value="arithmetic">Arithmetic (percentages, profit & loss, averages, ratios)</option>
-                    <option value="algebra">Algebra, equations, inequalities</option>
-                    <option value="time_work">Time & work, speed & distance</option>
-                    <option value="probability">Probability, permutations & combinations</option>
-                    <option value="data_interpretation">Data interpretation (tables, graphs)</option>
-                </optgroup>
-                <optgroup label="Logical Reasoning">
-                    <option value="puzzles">Puzzles, seating arrangements</option>
-                    <option value="blood_relations">Blood relations</option>
-                    <option value="series">Series (numbers, letters)</option>
-                    <option value="coding_decoding">Coding-decoding</option>
-                    <option value="syllogisms">Syllogisms</option>
-                </optgroup>
-                <optgroup label="Verbal Ability">
-                    <option value="grammar">Grammar correction</option>
-                    <option value="synonyms_antonyms">Synonyms & antonyms</option>
-                    <option value="reading_comprehension">Reading comprehension</option>
-                    <option value="sentence_completion">Sentence completion</option>
-                    <option value="para_jumbles">Para jumbles</option>
-                </optgroup>
-            </select>
-            
-            <label>Selection Mode:</label>
-            <select name="selection_mode" required>
-                <option value="multiple">Multiple</option>
-                <option value="individual">Individual</option>
-            </select>
-            
-            <button type="submit">Generate Quiz</button>
-        </form>
-        <p><a href="/dashboard">Back to Dashboard</a></p>
+  <h2>Create New Quiz</h2>
+  <div class="container">
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+    <form id="quizForm" method="POST" onsubmit="return showConfirmation()">
+      <input type="text" name="quiz_name" placeholder="Quiz Name" required>
+      <input type="number" name="num_questions" placeholder="Number of Questions" min="1" max="50" required>
+      <select name="difficulty" required>
+        <option value="">Select Difficulty</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+      <select name="selection_mode" required>
+        <option value="multiple">Multiple Choice</option>
+      </select>
+      <div class="question-types">
+        <h3>Select Categories:</h3>
+        <label><input type="checkbox" name="question_types" value="mixture_alligation"> Mixture and Alligation</label>
+        <label><input type="checkbox" name="question_types" value="profit_loss"> Profit and Loss</label>
+        <label><input type="checkbox" name="question_types" value="pipes_cisterns"> Pipes and Cisterns</label>
+        <label><input type="checkbox" name="question_types" value="age"> Age</label>
+        <label><input type="checkbox" name="question_types" value="permutation_combination"> Permutation and Combination</label>
+        <label><input type="checkbox" name="question_types" value="speed_time_distance"> Speed Time Distance</label>
+        <label><input type="checkbox" name="question_types" value="simple_interest"> Simple Interest</label>
+        <label><input type="checkbox" name="question_types" value="calendars"> Calendars</label>
+      </div>
+      <button type="submit">Create Quiz</button>
+    </form>
+
+    <div id="confirmation">
+      <h3>Confirm Quiz Details</h3>
+      <p><strong>Quiz Name:</strong> <span id="confirmQuizName"></span></p>
+      <p><strong>Number of Questions:</strong> <span id="confirmNumQuestions"></span></p>
+      <p><strong>Difficulty:</strong> <span id="confirmDifficulty"></span></p>
+      <p><strong>Selection Mode:</strong> <span id="confirmSelectionMode"></span></p>
+      <p><strong>Categories:</strong> <span id="selectedTypes"></span></p>
+      <div class="button-group">
+        <button onclick="confirmSubmission()">Confirm & Create</button>
+        <button onclick="cancelConfirmation()">Cancel</button>
+      </div>
     </div>
+  </div>
+  <footer>&copy; 2025 Quiz Creator. All rights reserved.</footer>
 </body>
 </html>

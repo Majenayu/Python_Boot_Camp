@@ -1,34 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        .container { max-width: 400px; margin: auto; }
-        input, select, button { margin: 10px; padding: 10px; width: 100%; }
-        button { background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .error { color: red; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register - School App</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #0a2342, #163a5f);
+      background-size: 400% 400%;
+      animation: backgroundShift 20s ease infinite;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: 40px 20px;
+      text-align: center;
+      position: relative;
+    }
+    @keyframes backgroundShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 0;
+    }
+    .container {
+      background: rgba(255 255 255 / 0.12);
+      padding: 40px 50px;
+      border-radius: 15px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(10, 35, 66, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      position: relative;
+      z-index: 1;
+      box-sizing: border-box;
+    }
+    h2 {
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 2.4rem;
+      color: #e0e7f8;
+    }
+    input, select {
+      width: 100%;
+      padding: 14px 18px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      outline: none;
+      background-color: rgba(255 255 255 / 0.9);
+      color: #0a2342;
+      transition: box-shadow 0.3s ease;
+    }
+    input:focus, select:focus {
+      box-shadow: 0 0 10px 3px #007bff;
+    }
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 14px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      background-color: #0a2342;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.6);
+    }
+    button:hover {
+      background-color: #0056b3;
+      box-shadow: 0 8px 26px rgba(0, 86, 179, 0.75);
+    }
+    .error {
+      color: #ff6b6b;
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+    p {
+      margin-top: 30px;
+      color: #dbe9ff;
+      font-size: 1rem;
+    }
+    p a {
+      color: #a3c7ff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    p a:hover {
+      text-decoration: underline;
+    }
+    /* Responsive */
+    @media (max-width: 700px) {
+      body {
+        padding: 30px 15px;
+      }
+      .container {
+        padding: 30px 25px;
+        max-width: 100%;
+      }
+      h2 {
+        font-size: 2rem;
+      }
+      button {
+        font-size: 1.1rem;
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Register</h2>
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-        <form method="POST">
-            <input type="text" name="name" placeholder="Name" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <select name="role" required>
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-            </select>
-            <button type="submit">Register</button>
-        </form>
-        <p>Already have an account? <a href="/login">Login</a></p>
-    </div>
+  <!-- Animated Wave Background -->
+  <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+    <path fill="#ffffff11" fill-opacity="1">
+      <animate attributeName="d" dur="10s" repeatCount="indefinite" values="
+        M0,160 C360,320 1080,0 1440,160 L1440,320 L0,320 Z;
+        M0,120 C480,280 960,40 1440,200 L1440,320 L0,320 Z;
+        M0,160 C360,320 1080,0 1440,160 L1440,320 L0,320 Z" />
+    </path>
+  </svg>
+
+  <div class="container">
+    <h2>Register</h2>
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+    <form method="POST" novalidate>
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <select name="role" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+      </select>
+      <button type="submit">Register</button>
+    </form>
+    <p>
+      Already have an account? <a href="/login">Login</a>
+    </p>
+  </div>
 </body>
 </html>

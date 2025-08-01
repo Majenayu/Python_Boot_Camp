@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teacher Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to bottom, #123a6e 0%, #4e7cbf 50%, #ffffff 100%) no-repeat fixed;
+  background-size: cover;
+      color: #123a6e;
+    }
+
+    h1, h2 {
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    p {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #f0f8ff;
+    }
+
+    .grid a {
+      min-height: 120px;
+      padding: 30px 20px;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+      text-decoration: none;
+    }
+
+    .grid a:hover {
+      transform: scale(1.05);
+      filter: brightness(0.95);
+    }
+
+    .create-quiz {
+      background-color: #A8D5BA;
+      color: #1B3B18;
+      box-shadow: 0 4px 12px rgba(168, 213, 186, 0.5);
+    }
+
+    .create-room {
+      background-color: #FFD8C2;
+      color: #663C00;
+      box-shadow: 0 4px 12px rgba(255, 216, 194, 0.5);
+    }
+
+    .analytics {
+      background-color: #C8B6E2;
+      color: #3E2F5B;
+      box-shadow: 0 4px 12px rgba(200, 182, 226, 0.5);
+    }
+
+    .logout {
+      background-color: #FFB3B3;
+      color: #5B1E1E;
+      box-shadow: 0 4px 12px rgba(255, 179, 179, 0.5);
+    }
+
+
+  .room-card {
+    background: white;
+    border-radius: 10px;
+    padding: 14px; /* smaller padding */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* lighter shadow */
+    transition: transform 0.2s ease;
+    color: #1e293b;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .room-card:hover {
+    transform: scale(1.015); /* slightly smaller hover effect */
+  }
+
+  .room-card h3 {
+    font-size: 18px; /* slightly smaller font */
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #123a6e;
+  }
+
+  .room-card p {
+    font-size: 14px; /* smaller font */
+    margin: 2px 0;
+    text-align: left;
+    color: #1e293b;
+  }
+
+  .room-card .mt-4 {
+    margin-top: 8px; /* reduce top margin before buttons */
+  }
+
+  @media (max-width: 768px) {
+    .room-card {
+      padding: 10px;
+    }
+  }
+
+
+    .container {
+      padding-top: 60px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .grid a {
+        font-size: 16px;
+        padding: 20px 16px;
+        min-height: 100px;
+      }
+
+      .room-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container p-6">
+    <h1 class="text-3xl font-bold mb-6">Welcome, {{ user.name }} (Teacher)</h1>
+    <p class="text-lg mb-4">This is your teacher dashboard.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+      <a href="{{ url_for('create_quiz') }}" class="create-quiz">📝 Create Quiz</a>
+      <a href="{{ url_for('create_room') }}" class="create-room">🏫 Create Room</a>
+      <a href="{{ url_for('analytics') }}" class="analytics">📊 View Analytics</a>
+      <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+    </div>
+
+    <h2 class="text-2xl font-semibold mb-4">Active Rooms</h2>
+
+    {% if active_rooms %}
+      <div class="w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {% for room in active_rooms %}
+            <div class="room-card">
+              <h3>{{ room.quiz_name }}</h3>
+              <p><strong>Room Code:</strong> <span class="font-mono">{{ room.room_code }}</span></p>
+              <p><strong>Students Joined:</strong> {{ room.num_students }}</p>
+              <p><strong>Status:</strong> {{ room.status | capitalize }}</p>
+              <div class="mt-4 space-y-2">
+                <a href="{{ url_for('room', room_id=room._id) }}"
+   class="block w-full bg-blue-500 text-white text-center px-2 py-1 text-xs rounded hover:bg-blue-600">
+   View Room
+</a>
+<a href="{{ url_for('score', room_id=room._id) }}"
+   class="block w-full bg-purple-500 text-white text-center px-2 py-1 text-xs rounded hover:bg-purple-600">
+   View Scores
+</a>
+
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="text-center text-white text-lg">No active rooms.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

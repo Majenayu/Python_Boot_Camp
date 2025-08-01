@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Room: {{ room.quiz_name }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to bottom, #123a6e, #ffffff);
+      color: #123a6e;
+    }
+
+    h1 {
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+     h2 {
+      color: black;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      margin: 10px 10px 0 0;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 10px 20px;
+      transition: all 0.3s ease-in-out;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .green {
+      background-color: #A8D5BA;
+      color: #1B3B18;
+    }
+
+    .green:hover {
+      background-color: #92c6aa;
+    }
+
+    .red {
+      background-color: #FFB3B3;
+      color: #5B1E1E;
+    }
+
+    .red:hover {
+      background-color: #e59e9e;
+    }
+
+    .blue {
+      background-color: #C8B6E2;
+      color: #3E2F5B;
+    }
+
+    .blue:hover {
+      background-color: #b0a2cb;
+    }
+
+    .gray {
+      background-color: #e2e8f0;
+      color: #2d3748;
+    }
+
+    .gray:hover {
+      background-color: #cbd5e0;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffa726;
+      padding: 16px;
+      color: #665c00;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        text-align: center;
+      }
+    }
+  </style>
+
+  <script>
+    function updateRoomStatus() {
+      fetch('{{ url_for("room_status", room_id=room._id) }}')
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'unauthenticated') {
+            document.getElementById('warning').classList.remove('hidden');
+            return;
+          }
+          if (data.error) {
+            console.error(data.error);
+            return;
+          }
+          document.getElementById('num-students').textContent = data.num_students;
+          document.getElementById('student-list').innerHTML = data.students.map(s => `<li>${s}</li>`).join('');
+          document.getElementById('room-status').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    setInterval(updateRoomStatus, 5000);
+    window.onload = updateRoomStatus;
+  </script>
+</head>
+<body>
+  <div class="container px-6 py-10">
+    <h1 class="text-3xl font-bold">Room: {{ room.quiz_name }}</h1>
+
+    <div class="card mt-6">
+      <p><strong>Room Code:</strong> <span class="font-mono">{{ room.room_code }}</span></p>
+      <p><strong>Status:</strong> <span id="room-status">{{ room.status | capitalize }}</span></p>
+      <p><strong>Students Joined:</strong> <span id="num-students">{{ room.num_students }}</span></p>
+
+      <div id="warning" class="warning hidden">
+        <strong>Warning:</strong> Your session may have expired or been overwritten. Please log in again as a teacher in a separate browser or incognito window to avoid conflicts with student sessions.
+      </div>
+
+      <h2 class="text-xl font-semibold mb-2 mt-6 text-center">Students Joined</h2>
+      <ul id="student-list" class="mb-6">
+        {% for student in room.students %}
+          <li>{{ student }}</li>
+        {% endfor %}
+      </ul>
+
+      <div class="flex flex-wrap justify-start">
+        {% if room.status == 'active' %}
+          <a href="{{ url_for('start_quiz', room_id=room._id) }}" class="btn green">▶️ Start Quiz</a>
+        {% endif %}
+        {% if room.status == 'started' %}
+          <a href="{{ url_for('stop_quiz', room_id=room._id) }}" class="btn red">⏹ Stop Quiz</a>
+        {% endif %}
+        <a href="{{ url_for('score', room_id=room._id) }}" class="btn blue">📊 View Scores</a>
+        <a href="{{ url_for('teacher_dashboard') }}" class="btn gray">← Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

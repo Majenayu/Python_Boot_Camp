@@ -1,157 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Take Quiz</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        .container { max-width: 600px; margin: auto; }
-        .question { margin: 20px 0; }
-        input[type="radio"] { margin: 10px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        #timer { font-size: 24px; color: red; }
-        #countdown { font-size: 48px; color: green; }
-        .results { text-align: left; }
-        .error { color: red; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #123a6e 30%, #ffffff 100%);
+            background-attachment: fixed;
+            color: #123a6e;
+        }
+        h2, h3 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        h2 {
+            color: #123a6e;
+        }
+        .question-box {
+            background-color: white;
+            border: 1px solid #123a6e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .question-box:hover {
+            transform: translateY(-3px);
+        }
+        .answer-label {
+            font-weight: bold;
+            color: #123a6e;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .wrong {
+            color: red;
+            font-weight: bold;
+        }
+        .button, .submit-btn {
+            text-decoration: none;
+            background-color: #123a6e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .button:hover, .submit-btn:hover {
+            background-color: #1b4e8f;
+            transform: scale(1.05);
+        }
+        .analytics {
+            background-color: rgba(255,255,255,0.9);
+            border: 1px solid #123a6e;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        form {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 8px;
+            font-size: 16px;
+        }
+        input[type="radio"] {
+            margin-right: 8px;
+        }
     </style>
-    <script>
-        // Convert Jinja variables to safe JS variables
-        let currentQuestion = 0;
-        let timePerQuestion = Number("{{ quiz.per_question_time | default(0) }}");
-        let numQuestions = Number("{{ quiz.num_questions | default(0) }}");
-        let questions = JSON.parse(`{{ quiz.questions | tojson | safe }}`);
-        const hasResults = "{{ 'true' if results else 'false' }}" === "true";
- 
-        let timer;
-        let answers = {};
-
-        function startCountdown() {
-            let countdown = 3;
-            document.getElementById('countdown').innerText = countdown;
-            let countdownInterval = setInterval(() => {
-                countdown--;
-                if (countdown >= 0) {
-                    document.getElementById('countdown').innerText = countdown;
-                } else {
-                    clearInterval(countdownInterval);
-                    document.getElementById('countdown').style.display = 'none';
-                    document.getElementById('quiz-content').style.display = 'block';
-                    startQuestionTimer();
-                    showQuestion();
-                }
-            }, 1000);
-        }
-
-        function startQuestionTimer() {
-            let timeLeft = timePerQuestion;
-            document.getElementById('timer').innerText = `Time Left: ${timeLeft}s`;
-            timer = setInterval(() => {
-                timeLeft--;
-                if (timeLeft >= 0) {
-                    document.getElementById('timer').innerText = `Time Left: ${timeLeft}s`;
-                } else {
-                    clearInterval(timer);
-                    saveAnswer();
-                    nextQuestion();
-                }
-            }, 1000);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showQuestion() {
-            if (!questions || currentQuestion >= questions.length) {
-                submitQuiz();
-                return;
-            }
-            const q = questions[currentQuestion];
-            document.getElementById('question-text').innerText = q.question || 'Question not available';
-            const optionsDiv = document.getElementById('options');
-            optionsDiv.innerHTML = '';
-            (q.options || []).forEach((option, index) => {
-                const escapedOption = escapeHtml(option);
-                optionsDiv.innerHTML += `
-                    <input type="radio" name="question_${currentQuestion}" value="${escapedOption}" id="option_${index}">
-                    <label for="option_${index}">${escapedOption}</label><br>
-                `;
-            });
-        }
-
-        function saveAnswer() {
-            const selectedOption = document.querySelector(`input[name="question_${currentQuestion}"]:checked`);
-            answers[`question_${currentQuestion}`] = selectedOption ? selectedOption.value : null;
-        }
-
-        function nextQuestion() {
-            clearInterval(timer);
-            saveAnswer();
-            currentQuestion++;
-            if (currentQuestion < numQuestions) {
-                startQuestionTimer();
-                showQuestion();
-            } else {
-                submitQuiz();
-            }
-        }
-
-        function submitQuiz() {
-            const form = document.getElementById('quiz-form');
-            for (const [key, value] of Object.entries(answers)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value || '';
-                form.appendChild(input);
-            }
-            form.submit();
-        }
-
-        // No more Jinja tags inside JS -> no VS Code errors
-        window.onload = function() {
-            if (!hasResults) {
-                if (numQuestions > 0 && timePerQuestion > 0) {
-                    startCountdown();
-                } else {
-                    document.getElementById('quiz-content').innerHTML = '<p class="error">Invalid quiz configuration.</p>';
-                }
-            }
-        };
-    </script>
 </head>
 <body>
-    <div class="container">
-        {% if results %}
-            <h2>Quiz Results: {{ quiz.quiz_name | default('Unnamed Quiz') }}</h2>
-            <p>Score: {{ score | default(0) }} / {{ quiz.num_questions | default(0) }}</p>
-            <div class="results">
-                {% for result in results %}
-                    <p><strong>Question:</strong> {{ result.question | default('N/A') }}</p>
-                    <p><strong>Your Answer:</strong> {{ result.user_answer | default('Skipped') }}</p>
-                    <p><strong>Correct Answer:</strong> {{ result.correct_answer | default('N/A') }}</p>
-                    <p><strong>Explanation:</strong> {{ result.explanation | default('No explanation available') }}</p>
-                    <p><strong>Correct:</strong> {{ 'Yes' if result.correct else 'No' }}</p>
-                    <hr>
-                {% endfor %}
-            </div>
-            <a href="/dashboard">Back to Dashboard</a>
-        {% else %}
-            <h2>{{ quiz.quiz_name | default('Unnamed Quiz') }}</h2>
-            <div id="countdown"></div>
-            <div id="quiz-content" style="display: none;">
-                <p id="timer"></p>
-                <form id="quiz-form" method="POST">
-                    <div class="question" id="question-text"></div>
-                    <div id="options"></div>
-                    <button type="button" onclick="nextQuestion()">Next</button>
-                </form>
-            </div>
-        {% endif %}
+
+<h2 style="color:white">{{ quiz.quiz_name }}</h2>
+
+{% if show_results %}
+    <h3 style="color: white;">Your Score: {{ score }}/{{ quiz.num_questions }}</h3>
+
+    <div class="analytics">
+        <p>Total Correct: <strong style="color: green;">{{ score }}</strong></p>
+        <p>Total Incorrect: <strong style="color: red;">{{ quiz.num_questions - score }}</strong></p>
+        <p>Percentage: <strong>{{ "%.2f"|format((score/quiz.num_questions)*100) }}%</strong></p>
     </div>
+
+    {% for r in results %}
+        <div class="question-box">
+            <p><strong>Q{{ loop.index }}:</strong> {{ r.question }}</p>
+
+            <p><span class="answer-label">Your Answer:</span>
+                {% if r.user_answer %}
+                    {{ r.user_answer }}
+                {% else %}
+                    <em>No answer provided</em>
+                {% endif %}
+            </p>
+
+            <p><span class="answer-label">Correct Answer:</span> {{ r.correct_answer }}</p>
+
+            <p>
+                {% if r.correct %}
+                    <span class="correct">✔ Correct</span>
+                {% else %}
+                    <span class="wrong">✘ Wrong</span>
+                {% endif %}
+            </p>
+
+            <p><span class="answer-label">Explanation:</span> {{ r.explanation }}</p>
+        </div>
+    {% endfor %}
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('download_results', quiz_id=quiz['_id']) }}" class="button">Download Results (CSV)</a>
+        <a href="{{ url_for('dashboard') }}" class="button">Back to Dashboard</a>
+    </div>
+
+{% else %}
+    <form method="POST">
+        <div class="question-box">
+            <p><strong>Question {{ current_question + 1 }}:</strong> {{ quiz.questions[current_question].question }}</p>
+
+            {% for option in quiz.questions[current_question].options %}
+                <label>
+                    <input type="radio" name="question_{{ current_question }}" value="{{ option }}"> {{ option }}
+                </label>
+            {% endfor %}
+        </div>
+
+        {% if current_question < quiz.num_questions - 1 %}
+            <button type="submit" name="next" class="submit-btn">Next</button>
+        {% else %}
+            <button type="submit" name="submit_quiz" class="submit-btn">Submit Quiz</button>
+        {% endif %}
+    </form>
+{% endif %}
+
 </body>
 </html>

@@ -1,18 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School App - Home</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        a { margin: 10px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
-        a:hover { background: #0056b3; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>School App - Home</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      background: linear-gradient(270deg, #0a2342, #163a5f);
+      background-size: 400% 400%;
+      animation: backgroundShift 20s ease infinite;
+      position: relative;
+      color: white;
+    }
+
+    @keyframes backgroundShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 0;
+    }
+
+    .container {
+      z-index: 2;
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .hero-image {
+      max-width: 400px;
+      width: 100%;
+      margin: 20px auto;
+      animation: zoomIn 1.5s ease;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      animation: fadeIn 2s ease-in;
+    }
+
+    a {
+      margin: 10px;
+      padding: 14px 30px;
+      background-color: white;
+      color: #0a2342;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1em;
+      border-radius: 50px;
+      display: inline-block;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+    }
+
+    a:hover {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+      a {
+        font-size: 0.95em;
+        padding: 12px 24px;
+      }
+      .hero-image {
+        max-width: 90%;
+      }
+    }
+  </style>
 </head>
 <body>
+  <!-- Animated Wave Background -->
+  <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+    <path fill="#ffffff11" fill-opacity="1">
+      <animate attributeName="d" dur="10s" repeatCount="indefinite" values="
+        M0,160 C360,320 1080,0 1440,160 L1440,320 L0,320 Z;
+        M0,120 C480,280 960,40 1440,200 L1440,320 L0,320 Z;
+        M0,160 C360,320 1080,0 1440,160 L1440,320 L0,320 Z" />
+    </path>
+  </svg>
+
+  <div class="container">
     <h1>Welcome to the School App</h1>
-    <a href="/login">Login</a>
-    <a href="/register">Register</a>
+    <img
+      src="https://cdn.prod.website-files.com/682d1c6b3c16bb956eafd6aa/682d1c6b3c16bb956eafda46_62dfbbe01c2d011b4e3cac6f_DrawKit_Vector_Illustration_Education_%2526_E-Learning_Blue_(5).png"
+      class="hero-image"
+    />
+    <div class="buttons">
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    </div>
+  </div>
 </body>
 </html>
+

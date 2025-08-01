@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiting Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function checkRoomStatus() {
+            fetch('{{ url_for("room_status", room_id=room_id) }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'started') {
+                        window.location.href = '{{ url_for("take_room_quiz", room_id=room_id) }}';
+                    } else if (data.status === 'stopped') {
+                        document.getElementById('message').textContent = 'The quiz has been stopped by the teacher.';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        setInterval(checkRoomStatus, 3000);
+        window.onload = checkRoomStatus;
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Waiting for Quiz to Start</h1>
+        <p id="message" class="text-lg mb-4">
+            {% if error %}
+                {{ error }}
+            {% else %}
+                Please wait for the teacher to start the quiz.
+            {% endif %}
+        </p>
+        <a href="{{ url_for('dashboard') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back to Dashboard</a>
+    </div>
+</body>
+</html>
