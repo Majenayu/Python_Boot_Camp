@@ -333,19 +333,19 @@ def take_room_quiz(room_id):
             user_name = session['name']
             user_collection = db[user_name]
             quiz_data = {
-                'quiz_name': room['quiz_name'],
-                'num_questions': room['num_questions'],
-                'total_time': room['total_time'],
-                'per_question_time': room['per_question_time'],
-                'difficulty': room['difficulty'],
-                'question_types': room['question_types'],
-                'selection_mode': room['selection_mode'],
-                'questions': questions,
-                'results': results,
-                'score': score,
-                'room_id': room_id,
-                'completed_at': datetime.datetime.now()
-            }
+    'quiz_name': room['quiz_name'],
+    'num_questions': room['num_questions'],
+    'total_time': room.get('total_time', 0),  # Use .get() with default value of 0
+    'per_question_time': room.get('per_question_time', 0),  # Also handle per_question_time
+    'difficulty': room['difficulty'],
+    'question_types': room['question_types'],
+    'selection_mode': room['selection_mode'],
+    'questions': questions,
+    'results': results,
+    'score': score,
+    'room_id': room_id,
+    'completed_at': datetime.datetime.now()
+}
             quiz_id = user_collection.insert_one(quiz_data).inserted_id
             rooms.update_one(
                 {'_id': ObjectId(room_id)},
