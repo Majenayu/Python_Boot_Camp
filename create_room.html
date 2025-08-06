@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create New Room</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #123a6e 30%, #ffffff 100%);
+      color: #123a6e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+      color: white;
+      font-size: 2.8em;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    .container {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 800px;
+      width: 95%;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+
+    form {
+      display: grid;
+      gap: 20px;
+    }
+
+    input[type="text"], input[type="number"], select {
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .question-types {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .question-types h3 {
+      margin-top: 0;
+      color: #123a6e;
+      font-size: 1.3em;
+      margin-bottom: 15px;
+    }
+
+    .question-types label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: #123a6e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      background-color: #1b4e8f;
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.1);
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    #confirmation {
+      display: none;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    #confirmation h3 {
+      color: #123a6e;
+    }
+
+    footer {
+      margin-top: auto;
+      color: white;
+      text-align: center;
+      font-size: 0.9em;
+      padding: 15px 0;
+    }
+
+    .language-select {
+      align-self: flex-end;
+      margin-bottom: 10px;
+      margin-right: 20px;
+    }
+  </style>
+
+  <script>
+    const translations = {
+      en: {
+        title: "Create New Room",
+        roomName: "Room Name",
+        numQuestions: "Number of Questions",
+        difficulty: "Difficulty",
+        easy: "Easy",
+        medium: "Medium",
+        hard: "Hard",
+        selectionMode: "Selection Mode",
+        multiple: "Multiple Choice",
+        categories: "Select Categories:",
+        mixture: "Mixture and Alligation",
+        profit: "Profit and Loss",
+        pipes: "Pipes and Cisterns",
+        age: "Age",
+        permutation: "Permutation and Combination",
+        speed: "Speed Time Distance",
+        interest: "Simple Interest",
+        calendar: "Calendars",
+        createRoom: "Create Room",
+         maths: "Maths",
+    class8: "Class 8",
+    class9: "Class 9",
+    class10: "Class 10",
+      },
+      hi: {
+        title: "नई कक्षा बनाएँ",
+        roomName: "कक्षा का नाम",
+        numQuestions: "प्रश्नों की संख्या",
+        difficulty: "कठिनाई",
+        easy: "आसान",
+        medium: "मध्यम",
+        hard: "कठिन",
+        selectionMode: "चयन विधि",
+        multiple: "बहुविकल्पीय",
+        categories: "श्रेणियाँ चुनें:",
+        mixture: "मिश्रण और अनुपात",
+        profit: "लाभ और हानि",
+        pipes: "पाइप्स और सिस्टर्न",
+        age: "उम्र",
+        permutation: "क्रमचय और संचय",
+        speed: "गति समय दूरी",
+        interest: "साधारण ब्याज",
+        calendar: "कैलेंडर",
+        createRoom: "कक्षा बनाएँ",
+        maths: "गणित",
+    class8: "कक्षा 8",
+    class9: "कक्षा 9",
+    class10: "कक्षा 10",
+      },
+      kn: {
+        title: "ಹೊಸ ಕೋಣೆ ರಚಿಸಿ",
+        roomName: "ಕೋಣೆ ಹೆಸರು",
+        numQuestions: "ಪ್ರಶ್ನೆಗಳ ಸಂಖ್ಯೆ",
+        difficulty: "ಅವಕಾಶದ ಮಟ್ಟ",
+        easy: "ಸರಳ",
+        medium: "ಮಧ್ಯಮ",
+            maths: "ಗಣಿತ",
+    class8: "ದರ್ಜೆ 8",
+    class9: "ದರ್ಜೆ 9",
+    class10: "ದರ್ಜೆ 10",
+        hard: "ಕಷ್ಟಕರ",
+        selectionMode: "ಆಯ್ಕೆ ವಿಧಾನ",
+        multiple: "ಬಹು ಆಯ್ಕೆ",
+        categories: "ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+        mixture: "ಮಿಶ್ರಣ ಮತ್ತು ಮೌಲ್ಯ",
+        profit: "ಲಾಭ ಮತ್ತು ನಷ್ಟ",
+        pipes: "ಪೈಪುಗಳು ಮತ್ತು ಸಿಸ್ಟರ್ನ್",
+        age: "ವಯಸ್ಸು",
+        permutation: "Permutation ಮತ್ತು Combination",
+        speed: "ವೇಗ ಸಮಯ ದೂರ",
+        interest: "ಸರಳ ಬಡ್ಡಿ",
+        calendar: "ಕ್ಯಾಲೆಂಡರ್‌ಗಳು",
+        createRoom: "ಕೋಣೆ ರಚಿಸಿ"
+      }
+      
+
+
+    };
+
+    function toggleMathsClasses(parentCheckbox) {
+  const subDiv = document.getElementById('mathsClasses');
+  subDiv.style.display = parentCheckbox.checked ? 'block' : 'none';
+
+  // Auto-uncheck child if parent is unchecked
+  if (!parentCheckbox.checked) {
+    subDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  }
+}
+
+
+    function showConfirmation() {
+      const form = document.getElementById('roomForm');
+      const selected = Array.from(form.querySelectorAll('input[name="question_types"]:checked')).map(cb => cb.value);
+      if (!selected.length) {
+        alert("Please select at least one category.");
+        return false;
+      }
+
+      document.getElementById('confirmName').textContent = form.quiz_name.value;
+      document.getElementById('confirmCount').textContent = form.num_questions.value;
+      document.getElementById('confirmDiff').textContent = form.difficulty.value;
+      document.getElementById('confirmMode').textContent = form.selection_mode.value;
+      document.getElementById('confirmCats').textContent = selected.join(', ');
+
+      document.getElementById('confirmation').style.display = 'block';
+      return false;
+    }
+
+    function confirmSubmission() {
+      document.getElementById('roomForm').submit();
+    }
+
+    function cancelConfirmation() {
+      document.getElementById('confirmation').style.display = 'none';
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      const lang = "{{ language }}";
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const key = el.dataset.key;
+        if (translations[lang][key]) el.textContent = translations[lang][key];
+      });
+      document.querySelectorAll("option[data-key]").forEach(opt => {
+        const key = opt.dataset.key;
+        if (translations[lang][key]) opt.textContent = translations[lang][key];
+      });
+
+      document.getElementById("languageSelect").value = lang;
+      document.getElementById("languageSelect").addEventListener("change", function () {
+        fetch(`/set_language/${this.value}`).then(() => location.reload());
+      });
+    });
+  </script>
+</head>
+<body>
+
+  <!-- 🌐 Language Selector -->
+  <div class="language-select">
+    <label for="languageSelect" style="color:white;">Language:</label>
+    <select id="languageSelect" class="p-2 rounded text-blue-900">
+      <option value="en">English</option>
+      <option value="hi">हिंदी</option>
+      <option value="kn">ಕನ್ನಡ</option>
+    </select>
+  </div>
+
+  <h2 data-key="title">Create New Room</h2>
+
+  <div class="container">
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+    <form id="roomForm" method="POST" onsubmit="return showConfirmation()">
+      <input type="text" name="quiz_name" required data-placeholder-key="roomName" placeholder="Room Name" />
+      <input type="number" name="num_questions" min="1" required data-placeholder-key="numQuestions" placeholder="Number of Questions" />
+
+      <select name="difficulty" required>
+        <option value="easy" data-key="easy">Easy</option>
+        <option value="medium" data-key="medium">Medium</option>
+        <option value="hard" data-key="hard">Hard</option>
+      </select>
+
+      <select name="selection_mode" required>
+        <option value="multiple" data-key="multiple">Multiple Choice</option>
+      </select>
+
+      <div class="question-types">
+  <h3 data-key="categories">Select Categories:</h3>
+
+  {% for value, label in [
+    ('mixture_alligation', 'mixture'),
+    ('profit_loss', 'profit'),
+    ('pipes_cisterns', 'pipes'),
+    ('age', 'age'),
+    ('permutation_combination', 'permutation'),
+    ('speed_time_distance', 'speed'),
+    ('simple_interest', 'interest'),
+    ('calendars', 'calendar')
+  ] %}
+    <label>
+      <input type="checkbox" name="question_types" value="{{ value }}">
+      <span data-key="{{ label }}">{{ label }}</span>
+    </label>
+  {% endfor %}
+<!-- ✅ Maths parent category -->
+<label>
+  <input type="checkbox" id="maths_parent" onclick="toggleMathsClasses(this)">
+  <span data-key="maths">Maths</span>
+</label>
+
+<div id="mathsClasses" style="margin-left: 20px; display: none;">
+  <label>
+    <input type="checkbox" name="question_types" value="Math_8th">
+    <span data-key="class8">Class 8</span>
+  </label>
+  <label>
+    <input type="checkbox" name="question_types" value="Math_9th">
+    <span data-key="class9">Class 9</span>
+  </label>
+  <label>
+    <input type="checkbox" name="question_types" value="Math_10th">
+    <span data-key="class10">Class 10</span>
+  </label>
+</div>
+
+
+      <button type="submit" data-key="createRoom">Create Room</button>
+    </form>
+
+    <div id="confirmation">
+      <h3>Confirm Room Details</h3>
+      <p><strong>Room Name:</strong> <span id="confirmName"></span></p>
+      <p><strong>Number of Questions:</strong> <span id="confirmCount"></span></p>
+      <p><strong>Difficulty:</strong> <span id="confirmDiff"></span></p>
+      <p><strong>Selection Mode:</strong> <span id="confirmMode"></span></p>
+      <p><strong>Categories:</strong> <span id="confirmCats"></span></p>
+      <button onclick="confirmSubmission()">Confirm & Create</button>
+      <button onclick="cancelConfirmation()">Cancel</button>
+    </div>
+  </div>
+
+  <footer>&copy; 2025 Quiz Creator. All rights reserved.</footer>
+</body>
+</html>

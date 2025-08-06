@@ -15,22 +15,18 @@
       color: #123a6e;
     }
 
-    h1 {
-      color: white;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    h1, h2 {
       text-align: center;
       margin-bottom: 20px;
-    }
-     h2 {
-      color: black;
       text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-      text-align: center;
-      margin-bottom: 20px;
     }
 
-    p {
-      font-size: 18px;
-      margin-bottom: 20px;
+    h1 {
+      color: white;
+    }
+
+    h2 {
+      color: black;
     }
 
     .card {
@@ -61,41 +57,15 @@
       transform: scale(1.05);
     }
 
-    .green {
-      background-color: #A8D5BA;
-      color: #1B3B18;
-    }
+    .green { background-color: #A8D5BA; color: #1B3B18; }
+    .red   { background-color: #FFB3B3; color: #5B1E1E; }
+    .blue  { background-color: #C8B6E2; color: #3E2F5B; }
+    .gray  { background-color: #e2e8f0; color: #2d3748; }
 
-    .green:hover {
-      background-color: #92c6aa;
-    }
-
-    .red {
-      background-color: #FFB3B3;
-      color: #5B1E1E;
-    }
-
-    .red:hover {
-      background-color: #e59e9e;
-    }
-
-    .blue {
-      background-color: #C8B6E2;
-      color: #3E2F5B;
-    }
-
-    .blue:hover {
-      background-color: #b0a2cb;
-    }
-
-    .gray {
-      background-color: #e2e8f0;
-      color: #2d3748;
-    }
-
-    .gray:hover {
-      background-color: #cbd5e0;
-    }
+    .green:hover { background-color: #92c6aa; }
+    .red:hover   { background-color: #e59e9e; }
+    .blue:hover  { background-color: #b0a2cb; }
+    .gray:hover  { background-color: #cbd5e0; }
 
     .warning {
       background-color: #fff3cd;
@@ -140,19 +110,33 @@
   </script>
 </head>
 <body>
+
+  <!-- 🌐 Language Selector -->
+  <div class="container p-6">
+    <!-- Language selector -->
+    <div class="flex justify-end mb-4">
+      <label for="languageSelect" class="mr-2 text-white">Language:</label>
+      <select id="languageSelect" class="p-2 rounded text-blue-900">
+  <option value="en" {{ 'selected' if language == 'en' else '' }}>English</option>
+  <option value="hi" {{ 'selected' if language == 'hi' else '' }}>हिंदी</option>
+  <option value="kn" {{ 'selected' if language == 'kn' else '' }}>ಕನ್ನಡ</option>
+</select>
+
+    </div>
+
   <div class="container px-6 py-10">
-    <h1 class="text-3xl font-bold">Room: {{ room.quiz_name }}</h1>
+    <h1 class="text-3xl font-bold" data-key="roomTitle">Room: {{ room.quiz_name }}</h1>
 
     <div class="card mt-6">
-      <p><strong>Room Code:</strong> <span class="font-mono">{{ room.room_code }}</span></p>
-      <p><strong>Status:</strong> <span id="room-status">{{ room.status | capitalize }}</span></p>
-      <p><strong>Students Joined:</strong> <span id="num-students">{{ room.num_students }}</span></p>
+      <p><strong data-key="roomCodeLabel">Room Code:</strong> <span class="font-mono">{{ room.room_code }}</span></p>
+      <p><strong data-key="statusLabel">Status:</strong> <span id="room-status">{{ room.status | capitalize }}</span></p>
+      <p><strong data-key="studentsLabel">Students Joined:</strong> <span id="num-students">{{ room.num_students }}</span></p>
 
-      <div id="warning" class="warning hidden">
+      <div id="warning" class="warning hidden" data-key="sessionWarning">
         <strong>Warning:</strong> Your session may have expired or been overwritten. Please log in again as a teacher in a separate browser or incognito window to avoid conflicts with student sessions.
       </div>
 
-      <h2 class="text-xl font-semibold mb-2 mt-6 text-center">Students Joined</h2>
+      <h2 class="text-xl font-semibold mb-2 mt-6 text-center" data-key="studentsJoined">Students Joined</h2>
       <ul id="student-list" class="mb-6">
         {% for student in room.students %}
           <li>{{ student }}</li>
@@ -161,15 +145,77 @@
 
       <div class="flex flex-wrap justify-start">
         {% if room.status == 'active' %}
-          <a href="{{ url_for('start_quiz', room_id=room._id) }}" class="btn green">▶️ Start Quiz</a>
+          <a href="{{ url_for('start_quiz', room_id=room._id) }}" class="btn green" data-key="startQuiz">▶️ Start Quiz</a>
         {% endif %}
         {% if room.status == 'started' %}
-          <a href="{{ url_for('stop_quiz', room_id=room._id) }}" class="btn red">⏹ Stop Quiz</a>
+          <a href="{{ url_for('stop_quiz', room_id=room._id) }}" class="btn red" data-key="stopQuiz">⏹ Stop Quiz</a>
         {% endif %}
-        <a href="{{ url_for('score', room_id=room._id) }}" class="btn blue">📊 View Scores</a>
-        <a href="{{ url_for('teacher_dashboard') }}" class="btn gray">← Back to Dashboard</a>
+        <a href="{{ url_for('score', room_id=room._id) }}" class="btn blue" data-key="viewScores">📊 View Scores</a>
+        <a href="{{ url_for('teacher_dashboard') }}" class="btn gray" data-key="backDashboard">← Back to Dashboard</a>
       </div>
     </div>
   </div>
+
+  <script>
+    const translations = {
+      en: {
+        roomTitle: "Room: {{ room.quiz_name }}",
+        roomCodeLabel: "Room Code:",
+        statusLabel: "Status:",
+        studentsLabel: "Students Joined:",
+        studentsJoined: "Students Joined",
+        startQuiz: "▶️ Start Quiz",
+        stopQuiz: "⏹ Stop Quiz",
+        viewScores: "📊 View Scores",
+        backDashboard: "← Back to Dashboard",
+        sessionWarning: "Warning: Your session may have expired or been overwritten. Please log in again as a teacher in a separate browser or incognito window to avoid conflicts with student sessions."
+      },
+      hi: {
+        roomTitle: "कक्षा: {{ room.quiz_name }}",
+        roomCodeLabel: "रूम कोड:",
+        statusLabel: "स्थिति:",
+        studentsLabel: "शामिल छात्र:",
+        studentsJoined: "छात्रों की सूची",
+        startQuiz: "▶️ प्रश्नोत्तरी शुरू करें",
+        stopQuiz: "⏹ प्रश्नोत्तरी बंद करें",
+        viewScores: "📊 अंक देखें",
+        backDashboard: "← डैशबोर्ड पर वापस जाएँ",
+        sessionWarning: "चेतावनी: आपका सत्र समाप्त हो गया है या अधिलेखित हो गया है। कृपया एक अन्य ब्राउज़र या गुप्त विंडो में शिक्षक के रूप में फिर से लॉग इन करें।"
+      },
+      kn: {
+        roomTitle: "ಕೋಣೆ: {{ room.quiz_name }}",
+        roomCodeLabel: "ರೂಮ್ ಕೋಡ್:",
+        statusLabel: "ಸ್ಥಿತಿ:",
+        studentsLabel: "ಚುಟುಕು ವಿದ್ಯಾರ್ಥಿಗಳು:",
+        studentsJoined: "ವಿದ್ಯಾರ್ಥಿಗಳು ಸೇರಿದ್ದಾರೆ",
+        startQuiz: "▶️ ಕ್ವಿಜ್ ಪ್ರಾರಂಭಿಸಿ",
+        stopQuiz: "⏹ ಕ್ವಿಜ್ ನಿಲ್ಲಿಸಿ",
+        viewScores: "📊 ಅಂಕಗಳನ್ನು ನೋಡಿ",
+        backDashboard: "← ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",
+        sessionWarning: "ಎಚ್ಚರಿಕೆ: ನಿಮ್ಮ ಸೆಷನ್ ಅವಧಿ ಮುಗಿದಿದೆ ಅಥವಾ ಒತ್ತಿಹಾಕಲಾಗಿದೆ. ಬೇರೆ ಬ್ರೌಸರ್ ಅಥವಾ ಇಂಕೊಗ್ನಿಟೋ ವಿಂಡೋನಲ್ಲಿ ಶಿಕ್ಷಕರಾಗಿ ಮತ್ತೆ ಲಾಗಿನ್ ಮಾಡಿ."
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const lang = "{{ language }}";
+      const langSelect = document.getElementById("languageSelect");
+
+      function applyLanguage(lang) {
+        document.querySelectorAll("[data-key]").forEach(el => {
+          const key = el.getAttribute("data-key");
+          if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+          }
+        });
+      }
+
+      applyLanguage(lang);
+
+      langSelect.addEventListener("change", function () {
+        const selectedLang = this.value;
+        fetch(`/set_language/${selectedLang}`).then(() => location.reload());
+      });
+    });
+  </script>
 </body>
 </html>

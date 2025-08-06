@@ -1,150 +1,229 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Take Quiz</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom right, #123a6e 30%, #ffffff 100%);
-            background-attachment: fixed;
-            color: #123a6e;
-        }
-        h2, h3 {
-            text-align: center;
-            margin-top: 20px;
-        }
-        h2 {
-            color: #123a6e;
-        }
-        .question-box {
-            background-color: white;
-            border: 1px solid #123a6e;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 800px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .question-box:hover {
-            transform: translateY(-3px);
-        }
-        .answer-label {
-            font-weight: bold;
-            color: #123a6e;
-        }
-        .correct {
-            color: green;
-            font-weight: bold;
-        }
-        .wrong {
-            color: red;
-            font-weight: bold;
-        }
-        .button, .submit-btn {
-            text-decoration: none;
-            background-color: #123a6e;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            margin: 5px;
-            display: inline-block;
-            transition: background-color 0.3s, transform 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-        .button:hover, .submit-btn:hover {
-            background-color: #1b4e8f;
-            transform: scale(1.05);
-        }
-        .analytics {
-            background-color: rgba(255,255,255,0.9);
-            border: 1px solid #123a6e;
-            border-radius: 10px;
-            max-width: 600px;
-            margin: 20px auto;
-            text-align: center;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        form {
-            text-align: center;
-        }
-        label {
-            display: block;
-            margin: 8px;
-            font-size: 16px;
-        }
-        input[type="radio"] {
-            margin-right: 8px;
-        }
-    </style>
+  <title>Take Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #123a6e 30%, #ffffff 100%);
+      background-attachment: fixed;
+      color: #123a6e;
+    }
+    h2, h3 { text-align: center; margin-top: 20px; }
+    h2 { color: #123a6e; }
+    .question-box {
+      background-color: white;
+      border: 1px solid #123a6e;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .question-box:hover { transform: translateY(-3px); }
+    .answer-label { font-weight: bold; color: #123a6e; }
+    .correct { color: green; font-weight: bold; }
+    .wrong { color: red; font-weight: bold; }
+    .button, .submit-btn {
+      text-decoration: none;
+      background-color: #123a6e;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin: 5px;
+      display: inline-block;
+      transition: background-color 0.3s, transform 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .button:hover, .submit-btn:hover {
+      background-color: #1b4e8f;
+      transform: scale(1.05);
+    }
+    .analytics {
+      background-color: rgba(255,255,255,0.9);
+      border: 1px solid #123a6e;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    form { text-align: center; }
+    label { display: block; margin: 8px; font-size: 16px; }
+    input[type="radio"] { margin-right: 8px; }
+  </style>
 </head>
 <body>
 
-<h2 style="color:white">{{ quiz.quiz_name }}</h2>
+<div class="container p-6">
+  <!-- Language selector -->
+  <div style="text-align: right; padding: 15px 20px;">
+  <label for="languageSelect" style="margin-right: 10px; font-weight: bold; color: white;">Language:</label>
+  <select id="languageSelect" style="padding: 6px 12px; border-radius: 5px; font-size: 15px; background-color: white; color: #123a6e; border: 1px solid #123a6e;">
+    <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+    <option value="hi" {% if language == 'hi' %}selected{% endif %}>हिंदी</option>
+    <option value="kn" {% if language == 'kn' %}selected{% endif %}>ಕನ್ನಡ</option>
+  </select>
+</div>
 
-{% if show_results %}
-    <h3 style="color: white;">Your Score: {{ score }}/{{ quiz.num_questions }}</h3>
 
+  <h2 style="color:white">{{ quiz.quiz_name }}</h2>
+
+  {% if show_results %}
+    <h3 style="color: white;" data-key="yourScore">Your Score: {{ score }}/{{ quiz.num_questions }}</h3>
     <div class="analytics">
-        <p>Total Correct: <strong style="color: green;">{{ score }}</strong></p>
-        <p>Total Incorrect: <strong style="color: red;">{{ quiz.num_questions - score }}</strong></p>
-        <p>Percentage: <strong>{{ "%.2f"|format((score/quiz.num_questions)*100) }}%</strong></p>
+      <p><span data-key="totalCorrect">Total Correct</span>: <strong style="color: green;">{{ score }}</strong></p>
+      <p><span data-key="totalIncorrect">Total Incorrect</span>: <strong style="color: red;">{{ quiz.num_questions - score }}</strong></p>
+      <p><span data-key="percentage">Percentage</span>: <strong>{{ "%.2f"|format((score/quiz.num_questions)*100) }}%</strong></p>
     </div>
 
     {% for r in results %}
-        <div class="question-box">
-            <p><strong>Q{{ loop.index }}:</strong> {{ r.question }}</p>
-
-            <p><span class="answer-label">Your Answer:</span>
-                {% if r.user_answer %}
-                    {{ r.user_answer }}
-                {% else %}
-                    <em>No answer provided</em>
-                {% endif %}
-            </p>
-
-            <p><span class="answer-label">Correct Answer:</span> {{ r.correct_answer }}</p>
-
-            <p>
-                {% if r.correct %}
-                    <span class="correct">✔ Correct</span>
-                {% else %}
-                    <span class="wrong">✘ Wrong</span>
-                {% endif %}
-            </p>
-
-            <p><span class="answer-label">Explanation:</span> {{ r.explanation }}</p>
-        </div>
+      <div class="question-box">
+        <p><strong>Q{{ loop.index }}:</strong> {{ r.question }}</p>
+        <p><span class="answer-label" data-key="yourAnswer">Your Answer:</span>
+          {% if r.user_answer %}
+            {{ r.user_answer }}
+          {% else %}
+            <em data-key="noAnswer">No answer provided</em>
+          {% endif %}
+        </p>
+        <p><span class="answer-label" data-key="correctAnswer">Correct Answer:</span> {{ r.correct_answer }}</p>
+        <p>
+          {% if r.correct %}
+            <span class="correct" data-key="correct">✔ Correct</span>
+          {% else %}
+            <span class="wrong" data-key="wrong">✘ Wrong</span>
+          {% endif %}
+        </p>
+        <p><span class="answer-label" data-key="explanation">Explanation:</span> {{ r.explanation }}</p>
+      </div>
     {% endfor %}
 
     <div style="text-align: center; margin-top: 20px;">
-        <a href="{{ url_for('download_results', quiz_id=quiz['_id']) }}" class="button">Download Results (CSV)</a>
-        <a href="{{ url_for('dashboard') }}" class="button">Back to Dashboard</a>
+      <a href="{{ url_for('download_results', quiz_id=quiz['_id']) }}" class="button" data-key="downloadResults">Download Results (CSV)</a>
+      <a href="{{ url_for('dashboard') }}" class="button" data-key="backToDashboard">Back to Dashboard</a>
     </div>
 
-{% else %}
+  {% else %}
     <form method="POST">
-        <div class="question-box">
-            <p><strong>Question {{ current_question + 1 }}:</strong> {{ quiz.questions[current_question].question }}</p>
+  <div class="question-box">
+    {% set q = quiz.questions[current_question] %}
 
-            {% for option in quiz.questions[current_question].options %}
-                <label>
-                    <input type="radio" name="question_{{ current_question }}" value="{{ option }}"> {{ option }}
-                </label>
-            {% endfor %}
-        </div>
+    <p><strong>Question {{ current_question + 1 }}:</strong>
+      {{ q['question_' + language] if 'question_' + language in q else q['question'] }}
+    </p>
 
-        {% if current_question < quiz.num_questions - 1 %}
-            <button type="submit" name="next" class="submit-btn">Next</button>
-        {% else %}
-            <button type="submit" name="submit_quiz" class="submit-btn">Submit Quiz</button>
-        {% endif %}
-    </form>
-{% endif %}
+    {% if 'options_' + language in q %}
+      {% for option in q['options_' + language] %}
+        <label>
+          <input type="radio" name="question_{{ current_question }}" value="{{ option }}"> {{ option }}
+        </label>
+      {% endfor %}
+    {% else %}
+      {% for option in q.options %}
+        <label>
+          <input type="radio" name="question_{{ current_question }}" value="{{ option }}"> {{ option }}
+        </label>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if current_question < quiz.num_questions - 1 %}
+    <button type="submit" name="next" class="submit-btn" id="nextBtn">
+      {% if language == 'kn' %}ಮುಂದೆ{% elif language == 'hi' %}अगला{% else %}Next{% endif %}
+    </button>
+  {% else %}
+    <button type="submit" name="submit_quiz" class="submit-btn" id="submitBtn">
+      {% if language == 'kn' %}ಸಲ್ಲಿಸು{% elif language == 'hi' %}सबमिट करें{% else %}Submit Quiz{% endif %}
+    </button>
+  {% endif %}
+</form>
+
+  {% endif %}
+</div>
+
+<script>
+  const translations = {
+    en: {
+      yourScore: "Your Score",
+      totalCorrect: "Total Correct",
+      totalIncorrect: "Total Incorrect",
+      percentage: "Percentage",
+      yourAnswer: "Your Answer",
+      correctAnswer: "Correct Answer",
+      explanation: "Explanation",
+      correct: "✔ Correct",
+      wrong: "✘ Wrong",
+      noAnswer: "No answer provided",
+      downloadResults: "Download Results (CSV)",
+      backToDashboard: "Back to Dashboard",
+      next: "Next",
+      submitQuiz: "Submit Quiz"
+    },
+    hi: {
+      yourScore: "आपका स्कोर",
+      totalCorrect: "कुल सही",
+      totalIncorrect: "कुल गलत",
+      percentage: "प्रतिशत",
+      yourAnswer: "आपका उत्तर",
+      correctAnswer: "सही उत्तर",
+      explanation: "व्याख्या",
+      correct: "✔ सही",
+      wrong: "✘ गलत",
+      noAnswer: "कोई उत्तर नहीं दिया गया",
+      downloadResults: "परिणाम डाउनलोड करें (CSV)",
+      backToDashboard: "डैशबोर्ड पर वापस जाएं",
+      next: "अगला",
+      submitQuiz: "प्रश्नोत्तरी सबमिट करें"
+    },
+    kn: {
+      yourScore: "ನಿಮ್ಮ ಅಂಕಗಳು",
+      totalCorrect: "ಒಟ್ಟು ಸರಿಯಾದವು",
+      totalIncorrect: "ಒಟ್ಟು ತಪ್ಪಾದವು",
+      percentage: "ಶೇಕಡಾವಾರು",
+      yourAnswer: "ನಿಮ್ಮ ಉತ್ತರ",
+      correctAnswer: "ಸರಿಯಾದ ಉತ್ತರ",
+      explanation: "ವಿವರಣೆ",
+      correct: "✔ ಸರಿಯಾದುದು",
+      wrong: "✘ ತಪ್ಪಾಗಿದೆ",
+      noAnswer: "ಯಾವುದೇ ಉತ್ತರ ನೀಡಿಲ್ಲ",
+      downloadResults: "ಫಲಿತಾಂಶವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ (CSV)",
+      backToDashboard: "ಡ್ಯಾಷ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",
+      next: "ಮುಂದೆ",
+      submitQuiz: "ಕ್ವಿಜ್ ಸಲ್ಲಿಸಿ"
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const lang = "{{ language }}";
+
+    const langSelect = document.getElementById("languageSelect");
+
+    function t(key) {
+      return translations[lang] && translations[lang][key] ? translations[lang][key] : key;
+    }
+
+    document.querySelectorAll("[data-key]").forEach(el => {
+      const key = el.getAttribute("data-key");
+      el.textContent = t(key);
+    });
+
+    const nextBtn = document.getElementById("nextBtn");
+    const submitBtn = document.getElementById("submitBtn");
+
+    if (nextBtn) nextBtn.textContent = t("next");
+    if (submitBtn) submitBtn.textContent = t("submitQuiz");
+
+    langSelect.addEventListener("change", function () {
+      fetch(`/set_language/${this.value}`).then(() => location.reload());
+    });
+  });
+</script>
 
 </body>
 </html>

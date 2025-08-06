@@ -11,11 +11,56 @@
             padding: 0;
             background: linear-gradient(to bottom, #123a6e, #ffffff);
             color: #123a6e;
+            min-height: 100vh;
+        }
+
+        /* Language selector styling */
+        .language-selector {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        .language-selector label {
+            margin-right: 10px;
+            color: white;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 2px solid #ffffff;
+            background: white;
+            color: #123a6e;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .language-selector select:hover {
+            border-color: #8ecae6;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #8ecae6;
+            box-shadow: 0 0 0 3px rgba(142, 202, 230, 0.3);
+        }
+
+        .container {
+            padding: 20px;
         }
 
         h2 {
             text-align: center;
-            margin: 40px 0 30px;
+            margin: 20px 0 30px;
             font-size: 32px;
             color: white;
             text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
@@ -23,11 +68,12 @@
 
         .line-chart-container {
             background: white;
-            border-radius: 10px;
-            padding: 25px;
+            border-radius: 15px;
+            padding: 30px;
             max-width: 900px;
             margin: 0 auto 50px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .pie-grid {
@@ -35,64 +81,124 @@
             flex-wrap: wrap;
             gap: 30px;
             justify-content: center;
+            margin-bottom: 40px;
         }
 
         .pie-card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            width: 300px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            width: 320px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
             text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.18);
         }
 
         .pie-card h3 {
             font-size: 18px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #123a6e;
+            font-weight: 600;
         }
 
         canvas {
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        p {
-            margin-top: 10px;
+        .pie-card p {
+            margin-top: 15px;
             color: #123a6e;
             font-size: 14px;
+            font-weight: 500;
         }
 
-        a {
+        .no-quiz-message {
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 50px auto;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .back-button {
             display: block;
             text-align: center;
-            margin: 40px 0;
+            margin: 40px auto;
             text-decoration: none;
             font-weight: bold;
             color: white;
-            background-color: #123a6e;
-            padding: 10px 20px;
-            border-radius: 5px;
+            background: linear-gradient(45deg, #123a6e, #1b4e8f);
+            padding: 12px 30px;
+            border-radius: 25px;
             max-width: 200px;
-            margin-left: auto;
-            margin-right: auto;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(18, 58, 110, 0.3);
         }
 
-        a:hover {
-            background-color: #1b4e8f;
-            transform: scale(1.05);
+        .back-button:hover {
+            background: linear-gradient(45deg, #1b4e8f, #2563ab);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(18, 58, 110, 0.4);
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .pie-card {
                 width: 90%;
+            }
+            
+            .language-selector {
+                padding: 0 10px;
+                margin-bottom: 15px;
+            }
+            
+            h2 {
+                font-size: 24px;
+                margin: 15px 0 20px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .language-selector {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 8px;
+            }
+            
+            .language-selector label {
+                margin-right: 0;
             }
         }
     </style>
 </head>
 <body>
+<div class="container p-6">
+    <!-- Language selector -->
+    <div class="language-selector">
+            <label for="languageSelect">Language:</label>
+            <select id="languageSelect">
+                <option value="en" {{ 'selected' if language == 'en' else '' }}>English</option>
+                <option value="hi" {{ 'selected' if language == 'hi' else '' }}>हिंदी</option>
+                <option value="kn" {{ 'selected' if language == 'kn' else '' }}>ಕನ್ನಡ</option>
+            </select>
+        </div>
 
-<h2>📈 Overall Quiz Analytics</h2>
+<h2 id="headingText">📈 Overall Quiz Analytics</h2>
+
 
 {% if quizzes %}
     <div class="line-chart-container">
@@ -104,7 +210,8 @@
             <div class="pie-card">
                 <h3>{{ quiz.quiz_name }} ({{ quiz.date }})</h3>
                 <canvas id="pieChart{{ loop.index }}"></canvas>
-                <p><strong>Score:</strong> {{ quiz.correct }}/{{ quiz.num_questions }} 
+                <p><strong class="label-score" data-key="score">Score:</strong> {{ quiz.correct }}/{{ quiz.num_questions }} 
+
                 ({{ (quiz.correct / quiz.num_questions * 100) | round(2) }}%)</p>
             </div>
         {% endfor %}
@@ -193,6 +300,59 @@
             }
         });
     });
+</script>
+<script>
+  const translations = {
+  en: {
+    heading: "📈 Overall Quiz Analytics",
+    noQuizzes: "No completed quizzes to display analytics.",
+    score: "Score:"
+  },
+  hi: {
+    heading: "📈 समग्र प्रश्नोत्तरी विश्लेषण",
+    noQuizzes: "कोई पूर्ण प्रश्नोत्तरी नहीं है जिसे विश्लेषण किया जा सके।",
+    score: "अंक:"
+  },
+  kn: {
+    heading: "📈 ಒಟ್ಟು ಪ್ರಶ್ನೋತ್ತರ ವಿಶ್ಲೇಷಣೆ",
+    noQuizzes: "ವಿಶ್ಲೇಷಿಸಲು ಯಾವುದೇ ಪೂರ್ಣಗೊಂಡ ಪ್ರಶ್ನೆಗಳನ್ನು ತೋರಿಸಲು ಇಲ್ಲ.",
+    score: "ಸ್ಕೋರ್:"
+  }
+};
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+  const lang = "{{ language }}";
+  const langSelect = document.getElementById("languageSelect");
+
+  function applyLanguage(lang) {
+    const headingEl = document.getElementById("headingText");
+    if (headingEl && translations[lang]) {
+      headingEl.textContent = translations[lang].heading;
+    }
+
+    const noQuizParagraph = document.querySelector("p[style*='No completed']");
+    if (noQuizParagraph && translations[lang]) {
+      noQuizParagraph.textContent = translations[lang].noQuizzes;
+    }
+
+    // ✅ Translate "Score:" labels
+    document.querySelectorAll('.label-score').forEach(el => {
+      if (translations[lang] && translations[lang].score) {
+        el.textContent = translations[lang].score;
+      }
+    });
+  }
+
+  applyLanguage(lang);
+
+  langSelect.addEventListener("change", function () {
+    const selectedLang = this.value;
+    fetch(`/set_language/${selectedLang}`)
+      .then(() => location.reload());
+  });
+});
+
 </script>
 
 </body>

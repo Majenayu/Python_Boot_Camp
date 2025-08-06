@@ -1,38 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waiting Room</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        function checkRoomStatus() {
-            fetch('{{ url_for("room_status", room_id=room_id) }}')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'started') {
-                        window.location.href = '{{ url_for("take_room_quiz", room_id=room_id) }}';
-                    } else if (data.status === 'stopped') {
-                        document.getElementById('message').textContent = 'The quiz has been stopped by the teacher.';
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-        setInterval(checkRoomStatus, 3000);
-        window.onload = checkRoomStatus;
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Waiting Room</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function checkRoomStatus() {
+      fetch('{{ url_for("room_status", room_id=room_id) }}')
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'started') {
+            window.location.href = '{{ url_for("take_room_quiz", room_id=room_id) }}';
+          } else if (data.status === 'stopped') {
+            document.getElementById('message').textContent = t('quizStopped');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    setInterval(checkRoomStatus, 3000);
+    window.onload = checkRoomStatus;
+  </script>
+  <style>
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 5px #123a6e;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6">Waiting for Quiz to Start</h1>
-        <p id="message" class="text-lg mb-4">
-            {% if error %}
-                {{ error }}
-            {% else %}
-                Please wait for the teacher to start the quiz.
-            {% endif %}
-        </p>
-        <a href="{{ url_for('dashboard') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back to Dashboard</a>
-    </div>
+
+  <div class="container mx-auto p-6">
+    <!-- Language Selector -->
+   <div class="flex justify-end mb-4">
+  <label for="languageSelect" class="mr-2 text-gray-700 font-semibold" data-key="languageLabel">Language:</label>
+  <select id="languageSelect" class="p-2 rounded border border-blue-900 text-blue-900">
+    <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+    <option value="hi" {% if language == 'hi' %}selected{% endif %}>हिंदी</option>
+    <option value="kn" {% if language == 'kn' %}selected{% endif %}>ಕನ್ನಡ</option>
+  </select>
+</div>
+
+
+    <h1 class="text-3xl font-bold mb-6" data-key="waitingTitle">Waiting for Quiz to Start</h1>
+    
+    <p id="message" class="text-lg mb-4" data-key="waitMessage">
+      {% if error %}
+        {{ error }}
+      {% else %}
+        Please wait for the teacher to start the quiz.
+      {% endif %}
+    </p>
+
+    <a href="{{ url_for('dashboard') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" data-key="backDashboard">Back to Dashboard</a>
+  </div>
+
+<script>
+  const translations = {
+    en: {
+      waitingTitle: "Waiting for Quiz to Start",
+      waitMessage: "Please wait for the teacher to start the quiz.",
+      quizStopped: "The quiz has been stopped by the teacher.",
+      backDashboard: "Back to Dashboard",
+      languageLabel: "Language:"
+    },
+    hi: {
+      waitingTitle: "प्रश्नोत्तरी शुरू होने की प्रतीक्षा कर रहे हैं",
+      waitMessage: "कृपया शिक्षक द्वारा प्रश्नोत्तरी शुरू करने की प्रतीक्षा करें।",
+      quizStopped: "प्रश्नोत्तरी शिक्षक द्वारा रोक दी गई है।",
+      backDashboard: "डैशबोर्ड पर वापस जाएँ",
+      languageLabel: "भाषा:"
+    },
+    kn: {
+      waitingTitle: "ಕ್ವಿಜ್ ಪ್ರಾರಂಭಿಸಲು ಕಾಯಲಾಗುತ್ತಿದೆ",
+      waitMessage: "ದಯವಿಟ್ಟು ಶಿಕ್ಷಕರು ಕ್ವಿಜ್ ಪ್ರಾರಂಭಿಸುವವರೆಗೆ ನಿರೀಕ್ಷಿಸಿ.",
+      quizStopped: "ಕ್ವಿಜ್ ಅನ್ನು ಶಿಕ್ಷಕರು ನಿಲ್ಲಿಸಿದ್ದಾರೆ.",
+      backDashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",
+      languageLabel: "ಭಾಷೆ:"
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const lang = "{{ language }}";  // this must be passed from Flask correctly
+    const langSelect = document.getElementById("languageSelect");
+
+    // Apply translations
+    function t(key) {
+      return translations[lang] && translations[lang][key] ? translations[lang][key] : key;
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const key = el.getAttribute("data-key");
+        el.textContent = t(key);
+      });
+    }
+
+    applyTranslations();
+
+    langSelect.addEventListener("change", function () {
+      fetch(`/set_language/${this.value}`)
+        .then(() => location.reload());
+    });
+  });
+</script>
+
+
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create New Quiz</title>
-  <style>
+    <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       margin: 0;
@@ -50,12 +50,6 @@
       font-size: 1em;
       width: 100%;
       box-sizing: border-box;
-      transition: border-color 0.3s;
-    }
-
-    input[type="text"]:focus, input[type="number"]:focus, select:focus {
-      border-color: #1b4e8f;
-      outline: none;
     }
 
     .question-types {
@@ -75,11 +69,6 @@
     .question-types label {
       display: block;
       margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    .question-types input[type="checkbox"] {
-      margin-right: 8px;
     }
 
     button {
@@ -115,22 +104,10 @@
       padding: 25px;
       margin-top: 20px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-      text-align: left;
     }
 
     #confirmation h3 {
       color: #123a6e;
-      margin-top: 0;
-    }
-
-    #confirmation p {
-      margin: 8px 0;
-    }
-
-    #confirmation .button-group {
-      margin-top: 20px;
-      display: flex;
-      gap: 15px;
     }
 
     footer {
@@ -141,13 +118,14 @@
       padding: 15px 0;
     }
 
-    @media (max-width: 600px) {
-      h2 { font-size: 2em; }
-      .container { padding: 20px; }
-      button { font-size: 1em; padding: 10px 20px; }
+    .language-select {
+      align-self: flex-end;
+      margin-bottom: 10px;
+      margin-right: 20px;
     }
   </style>
   <script>
+    
     function showConfirmation() {
       const form = document.getElementById('quizForm');
       const selectedTypes = Array.from(form.querySelectorAll('input[name="question_types"]:checked')).map(cb => cb.value);
@@ -171,36 +149,244 @@
     }
   </script>
 </head>
+<script>
+  const translations = {
+    en: {
+      title: "Create New Quiz",
+      quizName: "Quiz Name",
+      numQuestions: "Number of Questions",
+      difficulty: "Difficulty",
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard",
+      selectionMode: "Selection Mode",
+      multiple: "Multiple Choice",
+      categories: "Select Categories:",
+      mixture: "Mixture and Alligation",
+      profit: "Profit and Loss",
+      pipes: "Pipes and Cisterns",
+      age: "Age",
+      maths: "Maths",
+class8: "Class 8",
+class9: "Class 9",
+class10: "Class 10",
+
+      permutation: "Permutation and Combination",
+      speed: "Speed Time Distance",
+      interest: "Simple Interest",
+      calendar: "Calendars",
+      createQuiz: "Create Quiz"
+    },
+    hi: {
+      title: "नई प्रश्नोत्तरी बनाएँ",
+      quizName: "प्रश्नोत्तरी नाम",
+      numQuestions: "प्रश्नों की संख्या",
+      difficulty: "कठिनाई स्तर",
+      easy: "आसान",
+      medium: "मध्यम",
+       maths: "गणित",
+    class8: "कक्षा 8",
+    class9: "कक्षा 9",
+    class10: "कक्षा 10",
+      hard: "कठिन",
+      selectionMode: "चयन मोड",
+      multiple: "बहुविकल्पीय",
+      categories: "श्रेणियाँ चुनें:",
+      mixture: "मिश्रण और अनुपात",
+      profit: "लाभ और हानि",
+      pipes: "पाइप्स और सिस्टर्न",
+      age: "उम्र",
+      permutation: "क्रमचय और संचय",
+      speed: "गति समय दूरी",
+      interest: "साधारण ब्याज",
+      calendar: "कैलेंडर",
+      createQuiz: "प्रश्नोत्तरी बनाएँ"
+    },
+    kn: {
+      title: "ಹೊಸ ಪ್ರಶ್ನಾವಳಿ ರಚಿಸಿ",
+      quizName: "ಪ್ರಶ್ನಾವಳಿ ಹೆಸರು",
+      numQuestions: "ಪ್ರಶ್ನೆಗಳ ಸಂಖ್ಯೆ",
+      difficulty: "ಕಷ್ಟದ ಮಟ್ಟ",
+      easy: "ಸಹಜ",
+      medium: "ಮಧ್ಯಮ",
+      hard: "ಕಷ್ಟಕರ",
+      selectionMode: "ಆಯ್ಕೆ ವಿಧಾನ",
+      multiple: "ಬಹು ಆಯ್ಕೆ",
+      categories: "ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ:",
+      mixture: "ಮಿಶ್ರಣ ಮತ್ತು ಮೌಲ್ಯ",
+      profit: "ಲಾಭ ಮತ್ತು ನಷ್ಟ",
+      pipes: "ಪೈಪುಗಳು ಮತ್ತು ಸಿಸ್ಟರ್ನ್",
+      age: "ವಯಸ್ಸು",
+      permutation: "Permutation ಮತ್ತು Combination",
+      speed: "ವೇಗ ಸಮಯ ದೂರ",
+      interest: "ಸರಳ ಬಡ್ಡಿ",
+      calendar: "ಕ್ಯಾಲೆಂಡರ್‌ಗಳು", 
+      maths: "ಗಣಿತ",
+    class8: "ದರ್ಜೆ 8",
+    class9: "ದರ್ಜೆ 9",
+    class10: "ದರ್ಜೆ 10",
+      createQuiz: "ಪ್ರಶ್ನಾವಳಿ ರಚಿಸಿ"
+    }
+  };
+
+  window.addEventListener('DOMContentLoaded', function () {
+    const lang = "{{ language }}";
+    const languageSelect = document.getElementById("languageSelect");
+
+    function applyLanguage(lang) {
+      // Text content
+      document.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.getAttribute('data-key');
+        if (translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      // Placeholder
+      document.querySelectorAll('[data-placeholder-key]').forEach(el => {
+        const key = el.getAttribute('data-placeholder-key');
+        if (translations[lang][key]) {
+          el.placeholder = translations[lang][key];
+        }
+      });
+
+      // <option> values
+      document.querySelectorAll('option[data-key]').forEach(opt => {
+        const key = opt.getAttribute('data-key');
+        if (translations[lang][key]) {
+          opt.textContent = translations[lang][key];
+        }
+      });
+    }
+
+    if (languageSelect) {
+      languageSelect.value = lang;
+      languageSelect.addEventListener("change", function () {
+        const selectedLang = this.value;
+        fetch(`/set_language/${selectedLang}`).then(() => location.reload());
+      });
+    }
+
+    applyLanguage(lang);
+  });
+  function toggleMathsClasses(parentCheckbox) {
+  const subDiv = document.getElementById('mathsClasses');
+  subDiv.style.display = parentCheckbox.checked ? 'block' : 'none';
+
+  // Uncheck all subcategories if unchecked
+  if (!parentCheckbox.checked) {
+    subDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  }
+}
+
+</script>
+
+
+
+
 <body>
-  <h2>Create New Quiz</h2>
+  <!-- Language Selector -->
+  <div class="language-select">
+    <label for="languageSelect" style="color:white;">Language:</label>
+    <select id="languageSelect" class="p-2 rounded text-blue-900">
+      <option value="en">English</option>
+      <option value="hi">हिंदी</option>
+      <option value="kn">ಕನ್ನಡ</option>
+    </select>
+  </div>
+
+
+  <h2 data-key="title">Create New Quiz</h2>
+
+
+
+  
   <div class="container">
     {% if error %}
       <div class="error">{{ error }}</div>
     {% endif %}
     <form id="quizForm" method="POST" onsubmit="return showConfirmation()">
-      <input type="text" name="quiz_name" placeholder="Quiz Name" required>
-      <input type="number" name="num_questions" placeholder="Number of Questions" min="1" max="50" required>
-      <select name="difficulty" required>
-        <option value="">Select Difficulty</option>
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
+      <input type="text" name="quiz_name" required data-placeholder-key="quizName">
+<input type="number" name="num_questions" min="1" max="50" required data-placeholder-key="numQuestions">
+
+
+<select name="difficulty" required>
+  <option value="">--</option>
+  <option value="easy" data-key="easy">Easy</option>
+  <option value="medium" data-key="medium">Medium</option>
+  <option value="hard" data-key="hard">Hard</option>
+</select>
+
       <select name="selection_mode" required>
         <option value="multiple">Multiple Choice</option>
       </select>
       <div class="question-types">
-        <h3>Select Categories:</h3>
-        <label><input type="checkbox" name="question_types" value="mixture_alligation"> Mixture and Alligation</label>
-        <label><input type="checkbox" name="question_types" value="profit_loss"> Profit and Loss</label>
-        <label><input type="checkbox" name="question_types" value="pipes_cisterns"> Pipes and Cisterns</label>
-        <label><input type="checkbox" name="question_types" value="age"> Age</label>
-        <label><input type="checkbox" name="question_types" value="permutation_combination"> Permutation and Combination</label>
-        <label><input type="checkbox" name="question_types" value="speed_time_distance"> Speed Time Distance</label>
-        <label><input type="checkbox" name="question_types" value="simple_interest"> Simple Interest</label>
-        <label><input type="checkbox" name="question_types" value="calendars"> Calendars</label>
-      </div>
-      <button type="submit">Create Quiz</button>
+  <h3 data-key="categories">Select Categories:</h3>
+
+  <label>
+    <input type="checkbox" name="question_types" value="mixture_alligation">
+    <span data-key="mixture">Mixture and Alligation</span>
+  </label>
+
+  <label>
+    <input type="checkbox" name="question_types" value="profit_loss">
+    <span data-key="profit">Profit and Loss</span>
+  </label>
+
+  <label>
+    <input type="checkbox" name="question_types" value="pipes_cisterns">
+    <span data-key="pipes">Pipes and Cisterns</span>
+  </label>
+
+  <label>
+    <input type="checkbox" name="question_types" value="age">
+    <span data-key="age">Age</span>
+  </label>
+
+  <label>
+    <input type="checkbox" name="question_types" value="permutation_combination">
+    <span data-key="permutation">Permutation and Combination</span>
+  </label>
+
+  <label>
+    <input type="checkbox" name="question_types" value="speed_time_distance">
+    <span data-key="speed">Speed Time Distance</span>
+  </label>
+
+  <label>
+    <input type="checkbox" name="question_types" value="simple_interest">
+    <span data-key="interest">Simple Interest</span>
+  </label>
+
+  <label>
+    <input type="checkbox" name="question_types" value="calendars">
+    <span data-key="calendar">Calendars</span>
+  </label>
+<!-- ✅ Maths parent category -->
+<label>
+  <input type="checkbox" id="maths_parent" onclick="toggleMathsClasses(this)">
+  <span data-key="maths">Maths</span>
+</label>
+
+<div id="mathsClasses" style="margin-left: 20px; display: none;">
+  <label>
+    <input type="checkbox" name="question_types" value="Math_8th">
+    <span data-key="class8">Class 8</span>
+  </label>
+  <label>
+    <input type="checkbox" name="question_types" value="Math_9th">
+    <span data-key="class9">Class 9</span>
+  </label>
+  <label>
+    <input type="checkbox" name="question_types" value="Math_10th">
+    <span data-key="class10">Class 10</span>
+  </label>
+</div>
+
+
+
+      <button type="submit" data-key="createQuiz">Create Quiz</button>
+
     </form>
 
     <div id="confirmation">

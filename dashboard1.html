@@ -12,7 +12,7 @@
       margin: 0;
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background: linear-gradient(to bottom, #123a6e 0%, #4e7cbf 50%, #ffffff 100%) no-repeat fixed;
-  background-size: cover;
+      background-size: cover;
       color: #123a6e;
     }
 
@@ -73,52 +73,37 @@
       box-shadow: 0 4px 12px rgba(255, 179, 179, 0.5);
     }
 
-
-  .room-card {
-    background: white;
-    border-radius: 10px;
-    padding: 14px; /* smaller padding */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* lighter shadow */
-    transition: transform 0.2s ease;
-    color: #1e293b;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .room-card:hover {
-    transform: scale(1.015); /* slightly smaller hover effect */
-  }
-
-  .room-card h3 {
-    font-size: 18px; /* slightly smaller font */
-    font-weight: bold;
-    margin-bottom: 6px;
-    color: #123a6e;
-  }
-
-  .room-card p {
-    font-size: 14px; /* smaller font */
-    margin: 2px 0;
-    text-align: left;
-    color: #1e293b;
-  }
-
-  .room-card .mt-4 {
-    margin-top: 8px; /* reduce top margin before buttons */
-  }
-
-  @media (max-width: 768px) {
     .room-card {
-      padding: 10px;
+      background: white;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-  }
 
+    .room-card:hover {
+      transform: scale(1.015);
+    }
 
-    .container {
-      padding-top: 60px;
-      max-width: 960px;
-      margin: 0 auto;
+    .room-card h3 {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #123a6e;
+    }
+
+    .room-card p {
+      font-size: 14px;
+      margin: 2px 0;
+      text-align: left;
+      color: #1e293b;
+    }
+
+    .room-card .mt-4 {
+      margin-top: 8px;
     }
 
     @media (max-width: 768px) {
@@ -132,21 +117,39 @@
         padding: 16px;
       }
     }
+
+    .container {
+      padding-top: 60px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
-  <div class="container p-6">
-    <h1 class="text-3xl font-bold mb-6">Welcome, {{ user.name }} (Teacher)</h1>
-    <p class="text-lg mb-4">This is your teacher dashboard.</p>
+ <div class="container p-6">
+    <!-- Language selector -->
+    <div class="flex justify-end mb-4">
+      <label for="languageSelect" class="mr-2 text-white">Language:</label>
+      <select id="languageSelect" class="p-2 rounded text-blue-900">
+  <option value="en" {{ 'selected' if language == 'en' else '' }}>English</option>
+  <option value="hi" {{ 'selected' if language == 'hi' else '' }}>हिंदी</option>
+  <option value="kn" {{ 'selected' if language == 'kn' else '' }}>ಕನ್ನಡ</option>
+</select>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-      <a href="{{ url_for('create_quiz') }}" class="create-quiz">📝 Create Quiz</a>
-      <a href="{{ url_for('create_room') }}" class="create-room">🏫 Create Room</a>
-      <a href="{{ url_for('analytics') }}" class="analytics">📊 View Analytics</a>
-      <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
     </div>
 
-    <h2 class="text-2xl font-semibold mb-4">Active Rooms</h2>
+  <div class="container p-6">
+    <h1 class="text-3xl font-bold mb-6" data-key="welcomeText">Welcome, {{ user.name }} (Teacher)</h1>
+    <p class="text-lg mb-4" data-key="dashboardText">This is your teacher dashboard.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+      <a href="{{ url_for('create_quiz') }}" class="create-quiz" data-key="createQuiz">📝 Create Quiz</a>
+      <a href="{{ url_for('create_room') }}" class="create-room" data-key="createRoom">🏫 Create Room</a>
+      <a href="{{ url_for('analytics') }}" class="analytics" data-key="viewAnalytics">📊 View Analytics</a>
+      <a href="{{ url_for('logout') }}" class="logout" data-key="logout">🚪 Logout</a>
+    </div>
+
+    <h2 class="text-2xl font-semibold mb-4" data-key="activeRooms">Active Rooms</h2>
 
     {% if active_rooms %}
       <div class="w-full">
@@ -154,27 +157,95 @@
           {% for room in active_rooms %}
             <div class="room-card">
               <h3>{{ room.quiz_name }}</h3>
-              <p><strong>Room Code:</strong> <span class="font-mono">{{ room.room_code }}</span></p>
-              <p><strong>Students Joined:</strong> {{ room.num_students }}</p>
-              <p><strong>Status:</strong> {{ room.status | capitalize }}</p>
+              <p><strong data-key="roomCodeLabel">Room Code:</strong> <span class="font-mono">{{ room.room_code }}</span></p>
+              <p><strong data-key="studentsJoined">Students Joined:</strong> {{ room.num_students }}</p>
+              <p><strong data-key="status">Status:</strong> {{ room.status | capitalize }}</p>
               <div class="mt-4 space-y-2">
                 <a href="{{ url_for('room', room_id=room._id) }}"
-   class="block w-full bg-blue-500 text-white text-center px-2 py-1 text-xs rounded hover:bg-blue-600">
-   View Room
-</a>
-<a href="{{ url_for('score', room_id=room._id) }}"
-   class="block w-full bg-purple-500 text-white text-center px-2 py-1 text-xs rounded hover:bg-purple-600">
-   View Scores
-</a>
-
+                  class="block w-full bg-blue-500 text-white text-center px-2 py-1 text-xs rounded hover:bg-blue-600"
+                  data-key="viewRoom">View Room</a>
+                <a href="{{ url_for('score', room_id=room._id) }}"
+                  class="block w-full bg-purple-500 text-white text-center px-2 py-1 text-xs rounded hover:bg-purple-600"
+                  data-key="viewScores">View Scores</a>
               </div>
             </div>
           {% endfor %}
         </div>
       </div>
     {% else %}
-      <p class="text-center text-white text-lg">No active rooms.</p>
+      <p class="text-center text-white text-lg" data-key="noActiveRooms">No active rooms.</p>
     {% endif %}
   </div>
+
+  <script>
+    const translations = {
+      en: {
+        welcomeText: "Welcome, {{ user.name }} (Teacher)",
+        dashboardText: "This is your teacher dashboard.",
+        createQuiz: "📝 Create Quiz",
+        createRoom: "🏫 Create Room",
+        viewAnalytics: "📊 View Analytics",
+        logout: "🚪 Logout",
+        activeRooms: "Active Rooms",
+        roomCodeLabel: "Room Code:",
+        studentsJoined: "Students Joined:",
+        status: "Status:",
+        viewRoom: "View Room",
+        viewScores: "View Scores",
+        noActiveRooms: "No active rooms."
+      },
+      hi: {
+        welcomeText: "स्वागत है, {{ user.name }} (शिक्षक)",
+        dashboardText: "यह आपका शिक्षक डैशबोर्ड है।",
+        createQuiz: "📝 प्रश्नोत्तरी बनाएँ",
+        createRoom: "🏫 कक्षा बनाएँ",
+        viewAnalytics: "📊 विश्लेषण देखें",
+        logout: "🚪 लॉगआउट",
+        activeRooms: "सक्रिय कक्षाएँ",
+        roomCodeLabel: "रूम कोड:",
+        studentsJoined: "शामिल छात्र:",
+        status: "स्थिति:",
+        viewRoom: "कक्षा देखें",
+        viewScores: "अंकों को देखें",
+        noActiveRooms: "कोई सक्रिय कक्षाएँ नहीं हैं।"
+      },
+      kn: {
+        welcomeText: "ಸ್ವಾಗತ {{ user.name }} (ಶಿಕ್ಷಕ)",
+        dashboardText: "ಇದು ನಿಮ್ಮ ಶಿಕ್ಷಕರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್.",
+        createQuiz: "📝 ಪ್ರಶ್ನಾವಳಿ ರಚಿಸಿ",
+        createRoom: "🏫 ಕೊಠಡಿ ರಚಿಸಿ",
+        viewAnalytics: "📊 ವಿಶ್ಲೇಷಣೆ ನೋಡಿ",
+        logout: "🚪 ಲಾಗ್ ಔಟ್",
+        activeRooms: "ಸಕ್ರಿಯ ಕೊಠಡಿಗಳು",
+        roomCodeLabel: "ರೂಮ್ ಕೋಡ್:",
+        studentsJoined: "ಏಕತ್ವದ ವಿದ್ಯಾರ್ಥಿಗಳು:",
+        status: "ಸ್ಥಿತಿ:",
+        viewRoom: "ಕೊಠಡಿ ನೋಡಿ",
+        viewScores: "ಅಂಕಗಳನ್ನು ನೋಡಿ",
+        noActiveRooms: "ಯಾವುದೇ ಸಕ್ರಿಯ ಕೊಠಡಿಗಳು ಇಲ್ಲ."
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const lang = "{{ language }}";
+      const langSelect = document.getElementById("languageSelect");
+
+      function applyLanguage(lang) {
+        document.querySelectorAll("[data-key]").forEach(el => {
+          const key = el.getAttribute("data-key");
+          if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+          }
+        });
+      }
+
+      applyLanguage(lang);
+
+      langSelect.addEventListener("change", function () {
+        const selectedLang = this.value;
+        fetch(`/set_language/${selectedLang}`).then(() => location.reload());
+      });
+    });
+  </script>
 </body>
 </html>
